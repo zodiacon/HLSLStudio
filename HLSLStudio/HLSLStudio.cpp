@@ -3,6 +3,10 @@
 
 #include "pch.h"
 #include "MainFrm.h"
+#include <ThemeHelper.h>
+
+#pragma comment(lib, "imm32")
+#pragma comment(lib, "dxcompiler")
 
 CAppModule _Module;
 
@@ -26,13 +30,15 @@ int Run(LPTSTR /*lpstrCmdLine*/ = nullptr, int nCmdShow = SW_SHOWDEFAULT) {
 }
 
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int nCmdShow) {
-	HRESULT hRes = ::CoInitialize(nullptr);
+	HRESULT hRes = ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY);
 	ATLASSERT(SUCCEEDED(hRes));
 
 	AtlInitCommonControls(ICC_BAR_CLASSES);	// add flags to support other controls
 
 	hRes = _Module.Init(nullptr, hInstance);
 	ATLASSERT(SUCCEEDED(hRes));
+
+	ThemeHelper::Init();
 
 	int nRet = Run(lpstrCmdLine, nCmdShow);
 
