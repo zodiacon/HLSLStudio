@@ -16,6 +16,10 @@ BOOL CMainFrame::OnIdle() {
 	return FALSE;
 }
 
+BOOL CMainFrame::UIAddToolBar(HWND tb) {
+	return CAutoUpdateUI::UIAddToolBar(tb);
+}
+
 LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	Scintilla_RegisterClasses(nullptr);
 
@@ -64,9 +68,30 @@ LRESULT CMainFrame::OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 LRESULT CMainFrame::OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	auto pView = new CView(this);
 	pView->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	m_Tabs.AddPage(pView->m_hWnd, L"Untitled", 0, pView);
+	pView->SetName(L"Untitled");
+	m_Tabs.AddPage(pView->m_hWnd, pView->GetName(), 0, pView);
 
 	// TODO: add code to initialize document
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnFileOpen(WORD, WORD, HWND, BOOL&) {
+	CSimpleFileDialog dlg(TRUE, L"hlsl", nullptr, OFN_EXPLORER | OFN_ENABLESIZING,
+		L"HLSL Files (*.hlsl)\0*.hlsl\0All Files\0*.*\0", m_hWnd);
+	ThemeHelper::Suspend();
+	auto ok = IDOK == dlg.DoModal();
+	ThemeHelper::Resume();
+
+	auto pView = new CView(this);
+	pView->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+	if (!pView->LoadFile(dlg.m_szFileName)) {
+		AtlMessageBox(m_hWnd, L"Failed to read file", IDR_MAINFRAME, MB_ICONERROR);
+		pView->DestroyWindow();
+		return 0;
+	}
+	pView->SetName(dlg.m_szFileTitle);
+	m_Tabs.AddPage(pView->m_hWnd, dlg.m_szFileTitle, 0, pView);
 
 	return 0;
 }

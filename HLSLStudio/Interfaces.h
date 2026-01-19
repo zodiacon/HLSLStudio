@@ -5,8 +5,10 @@ enum class ShaderType {
 	Pixel,
 	Geometry,
 	Hull,
+	Compute,
+	Domain,
 };
 
 struct IMainFrame {
-	
+	virtual BOOL UIAddToolBar(HWND tb) = 0;
 };

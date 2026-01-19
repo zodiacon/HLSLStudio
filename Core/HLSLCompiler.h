@@ -10,6 +10,7 @@ struct HLSLCompilerOptions {
 	std::wstring Name{ L"shader" };
 	std::wstring MainEntryPoint { L"main" };
 	std::wstring Target { L"ps_6_0" };
+	std::wstring OutputFile;
 	std::vector<std::wstring> Defines;
 	bool EnableSlimDebugInfo{ true };
 };

@@ -15,6 +15,8 @@
 #define IDC_TYPE                        1000
 #define IDC_EDIT1                       1001
 #define IDC_MAIN                        1001
+#define IDC_COMBO1                      1002
+#define IDC_PROFILE                     1002
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_HLSL_COMPILE                 32775
@@ -32,7 +34,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        209
 #define _APS_NEXT_COMMAND_VALUE         32783
-#define _APS_NEXT_CONTROL_VALUE         1002
+#define _APS_NEXT_CONTROL_VALUE         1003
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

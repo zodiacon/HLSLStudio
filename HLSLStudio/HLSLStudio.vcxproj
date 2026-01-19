@@ -230,6 +230,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="RenderView.cpp" />
     <ClCompile Include="ScintillaCtrl.cpp" />
     <ClCompile Include="ShaderBar.cpp" />
     <ClCompile Include="View.cpp" />
@@ -238,6 +239,7 @@
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="RenderView.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ScintillaCommands.h" />
@@ -260,6 +262,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{efe113eb-a23d-40db-a52b-0db2ab5b86ae}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\lexilla\Lexilla.vcxproj">
+      <Project>{6d470002-e04d-4bbb-8b57-d20c2721fece}</Project>
     </ProjectReference>
     <ProjectReference Include="..\wtlhelper\WTLHelper\WTLHelper.vcxproj">
       <Project>{ae53419f-a769-4548-8e15-e311904df7df}</Project>
