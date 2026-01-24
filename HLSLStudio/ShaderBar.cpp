@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "ShaderBar.h"
-
+#include "ShaderDoc.h"
 #include <format>
 
 CString CShaderBar::GetEntryPoint() const {
@@ -17,6 +17,11 @@ CString CShaderBar::GetProfile() const {
 
 ShaderType CShaderBar::GetShaderType() const noexcept {
 	return static_cast<ShaderType>(m_ShaderTypeCombo.GetItemData(m_ShaderTypeCombo.GetCurSel()));
+}
+
+void CShaderBar::SetDocument(ShaderDoc* doc) noexcept {
+	m_Document = doc;
+	m_Document->GetShader(GetShaderType())->Profile = GetProfile();
 }
 
 LRESULT CShaderBar::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
@@ -48,7 +53,31 @@ LRESULT CShaderBar::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 
 LRESULT CShaderBar::OnTypeChanged(WORD, WORD, HWND, BOOL&) {
 	UpdateProfiles();
+	
+	auto type = GetShaderType();
+	auto item = m_Document->GetShader(type);
+	CheckDlgButton(IDC_ENABLE, item->Enabled);
+	SetDlgItemText(IDC_MAIN, item->Main);
+	if (item->Profile.IsEmpty())
+		item->Profile = GetProfile();
+	else
+		m_ProfileCombo.SelectString(-1, item->Profile);
 
+	return 0;
+}
+
+LRESULT CShaderBar::OnMainChanged(WORD, WORD, HWND, BOOL&) {
+	GetDlgItemText(IDC_MAIN, m_Document->GetShader(GetShaderType())->Main);
+	return 0;
+}
+
+LRESULT CShaderBar::OnToggleEnable(WORD, WORD, HWND, BOOL&) {
+	m_Document->GetShader(GetShaderType())->Enabled = IsDlgButtonChecked(IDC_ENABLE);
+	return 0;
+}
+
+LRESULT CShaderBar::OnProfileChanged(WORD, WORD, HWND, BOOL&) {
+	m_ProfileCombo.GetWindowText(m_Document->GetShader(GetShaderType())->Profile);
 	return 0;
 }
 

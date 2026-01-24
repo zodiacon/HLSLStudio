@@ -66,8 +66,9 @@ class CScintillaCommands {
 };
 
 class CEditor :
-	public CWindowImpl<CEditor, Scintilla::CScintillaCtrl>,
+	public Scintilla::CScintillaCtrl,
 	public CScintillaCommands<CEditor> {
+	
 	BEGIN_MSG_MAP(CEditor)
 		ALT_MSG_MAP(1)
 		CHAIN_MSG_MAP_ALT(CScintillaCommands<CEditor>, 1)

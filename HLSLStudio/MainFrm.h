@@ -8,6 +8,7 @@
 #include "Interfaces.h"
 #include <OwnerDrawnMenu.h>
 #include <CustomTabView.h>
+#include "ShaderDoc.h"
 
 class CMainFrame :
 	public CFrameWindowImpl<CMainFrame>,
@@ -48,6 +49,7 @@ protected:
 
 private:
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	void InitMenu(HMENU hMenu);
 	LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled);
 	LRESULT OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
@@ -60,4 +62,5 @@ private:
 
 private:
 	CCustomTabView m_Tabs;
+	std::vector<std::unique_ptr<ShaderDoc>> m_Documents;
 };

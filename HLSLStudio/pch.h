@@ -22,8 +22,13 @@ extern CAppModule _Module;
 #include <atlctrlx.h>
 #include <atlsplit.h>
 #include <atlctrlw.h>
-
+#include <memory>
+#include <vector>
 #include <scintilla/Scintilla.h>
+#include <dxgi1_5.h>
+#include <dxgi1_5.h>
+#include <d3dx12.h>
+#include <dxcapi.h>
 
 #if defined _M_IX86
   #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")

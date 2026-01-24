@@ -9,6 +9,7 @@ public:
 
 	std::string GetErrors() const noexcept;
 	IDxcResult* Get() const noexcept;
+	bool HasErrors() const noexcept;
 
 private:
 	CComPtr<IDxcResult> m_Result;

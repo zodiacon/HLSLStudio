@@ -19,3 +19,8 @@ std::string CompileResult::GetErrors() const noexcept {
 IDxcResult* CompileResult::Get() const noexcept {
 	return m_Result;
 }
+
+bool CompileResult::HasErrors() const noexcept {
+	HRESULT hr;
+	return S_OK == m_Result->GetStatus(&hr) && FAILED(hr);
+}

@@ -73,6 +73,7 @@ BEGIN
     POPUP "&Edit"
     BEGIN
         MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM "&Redo\tCtrl+Y",               ID_EDIT_REDO
         MENUITEM SEPARATOR
         MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
         MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
@@ -85,6 +86,7 @@ BEGIN
     POPUP "H&LSL"
     BEGIN
         MENUITEM "&Compile",                    ID_HLSL_COMPILE
+        MENUITEM "&Run",                        ID_HLSL_RUN
     END
     POPUP "&Window"
     BEGIN
@@ -119,7 +121,17 @@ IDI_OPEN                ICON                    "res\\open.ico"
 
 IDI_PASTE               ICON                    "res\\Paste.ico"
 
-IDI_SAVE                ICON                    "res\\save.ico"
+IDI_SAVE                ICON                    "D:\\Dev\\HLSLStudio\\HLSLStudio\\res\\save.ico"
+
+IDI_CUT                 ICON                    "res\\cut.ico"
+
+IDI_NEW                 ICON                    "res\\new.ico"
+
+IDI_REDO                ICON                    "res\\Redo.ico"
+
+IDI_UNDO                ICON                    "res\\Undo.ico"
+
+IDI_RUN                 ICON                    "res\\run.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -127,27 +139,27 @@ IDI_SAVE                ICON                    "res\\save.ico"
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOG 0, 0, 187, 102
+IDD_ABOUTBOX DIALOGEX 0, 0, 209, 91
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "About"
-FONT 9, "Segoe UI"
+CAPTION "About HLSL Studio"
+FONT 9, "Segoe UI", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,130,81,50,14
-    CTEXT           "HLSLStudio Application v1.0\n\n(c) Copyright 2026",IDC_STATIC,25,57,78,32
-    ICON            IDR_MAINFRAME,IDC_STATIC,55,26,18,20
-    GROUPBOX        "",IDC_STATIC,7,7,115,88
+    DEFPUSHBUTTON   "OK",IDOK,79,70,50,14
+    CTEXT           "HLSL Studio v0.1\n\n©2026 Pavel Yosifovich",IDC_STATIC,60,25,78,32
+    ICON            IDR_MAINFRAME,IDC_STATIC,7,7,20,20
 END
 
 IDD_SHADERBAR DIALOGEX 0, 0, 375, 16
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "Shader Type:",IDC_STATIC,6,4,44,8
-    COMBOBOX        IDC_TYPE,59,2,57,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Entry Point:",IDC_STATIC,227,4,39,8
-    EDITTEXT        IDC_MAIN,271,2,92,14,ES_AUTOHSCROLL
-    LTEXT           "Profile:",IDC_STATIC,127,4,24,8
-    COMBOBOX        IDC_PROFILE,156,2,58,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Shader:",IDC_STATIC,6,4,26,8
+    COMBOBOX        IDC_TYPE,36,2,57,53,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Entry Point:",IDC_STATIC,238,4,39,8
+    EDITTEXT        IDC_MAIN,282,2,92,14,ES_AUTOHSCROLL
+    LTEXT           "Profile:",IDC_STATIC,143,4,24,8
+    COMBOBOX        IDC_PROFILE,167,2,58,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Enable",IDC_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,98,3,37,10
 END
 
 
@@ -162,9 +174,9 @@ BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 180
+        RIGHTMARGIN, 202
         TOPMARGIN, 7
-        BOTTOMMARGIN, 95
+        BOTTOMMARGIN, 84
     END
 
     IDD_SHADERBAR, DIALOG
@@ -208,8 +220,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 0,1,0,0
+ PRODUCTVERSION 0,1,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -222,15 +234,16 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904B0"
+        BLOCK "040904b0"
         BEGIN
-            VALUE "FileDescription", "HLSLStudio Module"
-            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "CompanyName", "Scorpio Software"
+            VALUE "FileDescription", "HLSL Studio "
+            VALUE "FileVersion", "0.1.0.0"
             VALUE "InternalName", "HLSLStudio"
-            VALUE "LegalCopyright", "Copyright 2026"
+            VALUE "LegalCopyright", "©2026 Pavel Yosifovich"
             VALUE "OriginalFilename", "HLSLStudio.exe"
             VALUE "ProductName", "HLSLStudio Module"
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "ProductVersion", "0.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -246,6 +259,11 @@ END
 //
 
 IDD_SHADERBAR AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_ABOUTBOX AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

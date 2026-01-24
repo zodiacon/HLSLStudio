@@ -8,44 +8,41 @@
 #include "resource.h"
 #include <fstream>
 #include <wil/resource.h>
+#include "ShaderDoc.h"
 #include <scintilla/ILexer.h>
 #include "../lexilla/Lexlib/LexerModule.h"
 #include "../lexilla/Include/SciLexer.h"
 
 const char* KeyWords_CPP[] = {
 	// Primary keywords
-	"alignas alignof asm audit auto axiom bitand bitor bool break case catch char class compl concept "
-	"const const_cast consteval constexpr continue co_await co_return co_yield "
-	"decltype default defined delete do double dynamic_cast else enum explicit export extern false final float for "
-	"friend goto if import inline int long module mutable naked namespace new noexcept not not_eq noreturn nullptr "
-	"operator or or_eq override private protected public "
-	"register reinterpret_cast requires restrict return "
+	"alignas alignof asm audit auto bool break case catch char class "
+	"const const_cast consteval constexpr continue "
+	"decltype default delete do double else enum explicit export extern false final float for "
+	"goto if import inline int long module mutable naked namespace new noexcept not not_eq noreturn nullptr "
+	"operator or override private protected public "
+	"register reinterpret_cast restrict return "
 	"short signed sizeof static static_assert static_cast struct switch "
-	"template this thread_local throw true try typedef typeid typename "
-	"union unsigned using virtual void volatile while xor xor_eq",
-// Secondary keywords
-	"float4 float3 float2 mat3x3 mat4x4",
-	"",
-// special keywords
-	"SV_POSITION POSITION TEXCOORD SV_TARGET",
-// Global classes and typedefs
-	"char8_t char16_t char32_t int16_t int32_t "
-	"int64_t int8_t intmax_t intptr_t ptrdiff_t size_t uint16_t uint32_t uint64_t uint8_t uintmax_t uintptr_t wchar_t",
-	"",
-	nullptr,
+	"template this true typedef typeid typename "
+	"union unsigned using virtual void volatile while xor",
+	// Secondary keywords
+		"float4 float3 float2 mat3x3 mat4x4",
+		"",
+	// special keywords
+		"SV_POSITION POSITION TEXCOORD SV_TARGET",
+	// Global classes and typedefs
+		"char8_t char16_t char32_t int16_t int32_t "
+		"int64_t int8_t intmax_t intptr_t ptrdiff_t size_t uint16_t uint32_t uint64_t uint8_t uintmax_t uintptr_t wchar_t",
+		"",
+		nullptr,
 };
+
+CView::CView(IMainFrame* frame) : CFrameView(frame), m_RenderView(frame) {
+	m_RenderView.SetStatic(true);
+}
 
 BOOL CView::PreTranslateMessage(MSG* pMsg) {
 	pMsg;
 	return FALSE;
-}
-
-void CView::SetName(PCWSTR name) {
-	m_Name = name;
-}
-
-CString const& CView::GetName() const noexcept {
-	return m_Name;
 }
 
 bool CView::LoadFile(PCWSTR path) {
@@ -65,46 +62,79 @@ bool CView::LoadFile(PCWSTR path) {
 	return true;
 }
 
+void CView::SetDocument(ShaderDoc* doc) noexcept {
+	m_Document = doc;
+	m_ShaderBar.SetDocument(doc);
+}
+
+CompileResult CView::CompileShader(ShaderItem& shader, const char* text, HLSLCompilerOptions& options) {
+	options.MainEntryPoint = shader.Main;
+	options.Target = shader.Profile;
+	auto result = m_Compiler.CompileSource(text, options);
+	auto errors = result.GetErrors();
+
+	//m_BuildLog.StartStyling(m_BuildLog.GetTextLength(), 0);
+	int lines = m_BuildLog.GetLineCount();
+	m_BuildLog.AppendText(errors.length(), errors.c_str());
+
+	static const struct {
+		PCWSTR keyword;
+		int style;
+	} styles[] = {
+		{ L"warning", WarningStyle },
+		{ L"error", ErrorStyle },
+	};
+
+	for (int i = lines - 1; i < m_BuildLog.GetLineCount(); i++) {
+		auto line = m_BuildLog.GetLine(i);
+		for (auto& style : styles)
+			if (line.Find(style.keyword) >= 0) {
+				m_BuildLog.StartStyling(m_BuildLog.PositionFromLine(i), 0);
+				m_BuildLog.SetStyling(line.GetLength(), style.style);
+				break;
+			}
+	}
+	return result;
+}
+
 LRESULT CView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	m_hWndClient = m_MainSplitter.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN);
 	m_DetailSplitter.Create(m_MainSplitter, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN);
+
 	m_Editor.Create(m_DetailSplitter, rcDefault, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, IDC_EDITOR, WS_EX_CLIENTEDGE);
 	m_BuildLog.Create(m_DetailSplitter, rcDefault, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, IDC_LOGGER, WS_EX_CLIENTEDGE);
 	m_BuildLog.SetReadOnly(TRUE);
+
+	m_RenderView.Create(m_MainSplitter, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, WS_EX_CLIENTEDGE);
 
 	m_Editor.SetScrollWidth(100);
 	m_Editor.SetScrollWidthTracking(TRUE);
 	m_BuildLog.SetScrollWidth(100);
 	m_BuildLog.SetScrollWidthTracking(TRUE);
 
-	m_MainSplitter.SetSplitterPane(0, m_DetailSplitter);
+	m_MainSplitter.SetSplitterPanes(m_DetailSplitter, m_RenderView);
 	m_DetailSplitter.SetSplitterPanes(m_Editor, m_BuildLog);
 
 	m_MainSplitter.SetSplitterPosPct(50);
 	m_DetailSplitter.SetSplitterPosPct(85);
 
 	extern const Lexilla::LexerModule lmCPP;
-	static auto lexer = [&]() {
-		auto lexer = lmCPP.Create();
-		auto count = _countof(KeyWords_CPP);
-		for (int i = 0; i < count; i++)
-			lexer->WordListSet(i, KeyWords_CPP[i]);
-		return lexer;
-	}();
+	auto lexer = lmCPP.Create();
+	int count = _countof(KeyWords_CPP);
+	for (int i = 0; i < count; i++)
+		lexer->WordListSet(i, KeyWords_CPP[i]);
 
 	m_Editor.SetILexer(lexer);
 
 	ToolBarButtonInfo const buttons[] = {
 		{ ID_HLSL_COMPILE, IDI_COMPILE, BTNS_BUTTON, L"Compile" },
-		{ 0 },
-		{ ID_EDIT_COPY, IDI_COPY },
-		{ ID_EDIT_PASTE, IDI_PASTE },
+		{ ID_HLSL_RUN, IDI_RUN, BTNS_BUTTON, L"Run" },
 	};
 	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
-	CToolBarCtrl tb = ToolbarHelper::CreateAndInitToolBar(m_hWnd, buttons, _countof(buttons), 16);
+	auto tb = ToolbarHelper::CreateAndInitToolBar(m_hWnd, buttons, _countof(buttons), 16);
 	m_ShaderBar.Create(*this);
 	AddSimpleReBarBand(m_ShaderBar);
-	AddSimpleReBarBand(tb);
+	AddSimpleReBarBand(tb, L"");
 
 	Frame()->UIAddToolBar(tb);
 	CReBarCtrl(m_hWndToolBar).LockBands(true);
@@ -119,11 +149,20 @@ LRESULT CView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOO
 	m_Editor.StyleSetFore(SCE_C_PREPROCESSOR, RGB(255, 128, 0));
 	m_Editor.StyleSetFore(SCE_C_WORD, RGB(0, 0, 255));
 	m_Editor.StyleSetFore(SCE_C_WORD2, RGB(0, 128, 255));
+	m_Editor.SetCaretLineBack(RGB(255, 255, 0));
 
 	m_BuildLog.StyleSetSize(STYLE_DEFAULT, 10);
 	m_BuildLog.StyleClearAll();
 
+	m_BuildLog.StyleSetFore(ErrorStyle, RGB(240, 0, 0));
+	m_BuildLog.StyleSetFore(WarningStyle, RGB(128, 128, 0));
+
 	return S_OK == m_Compiler.Init() ? 0 : -1;
+}
+
+LRESULT CView::OnDestroy(UINT, WPARAM, LPARAM, BOOL& handled) {
+	handled = FALSE;
+	return 0;
 }
 
 LRESULT CView::OnCompile(WORD, WORD, HWND, BOOL&) {
@@ -135,44 +174,42 @@ LRESULT CView::OnCompile(WORD, WORD, HWND, BOOL&) {
 	}
 	m_Editor.GetText(text.length(), text.data());
 
-	HLSLCompilerOptions options;
-	options.MainEntryPoint = m_ShaderBar.GetEntryPoint();
-	options.Target = m_ShaderBar.GetProfile();
-	options.Name = m_Name;
-
-	m_Result = m_Compiler.CompileSource(text, options);
-	auto errors = m_Result.GetErrors();
-
 	m_BuildLog.SetReadOnly(FALSE);
 	m_BuildLog.ClearAll();
 
-	m_BuildLog.StyleSetFore(50, RGB(128, 0, 0));
-	m_BuildLog.AppendText(errors.length(), errors.c_str());
-	m_BuildLog.StartStyling(0, 0);
-	m_BuildLog.SetStyling(m_BuildLog.GetTextLength(), 50);
-	m_BuildLog.SetReadOnly(TRUE);
+	HLSLCompilerOptions options;
+	options.Name = m_Document->GetName();
 
-	auto reflect = m_Compiler.GetReflectionFromResult();
-	if (reflect) {
-		D3D12_SHADER_DESC desc;
-		reflect->GetDesc(&desc);
+	int active = 0;
+	for (auto& shader : m_Document->GetActiveShaders()) {
+		active++;
+		shader.Result = CompileShader(shader, text.c_str(), options);
 	}
+	if (active == 0) {
+		// compile active shader
+		auto shader = m_Document->GetShader(m_ShaderBar.GetShaderType());
+		ATLASSERT(shader);
+		shader->Result = CompileShader(*shader, text.c_str(), options);
+	}
+	m_BuildLog.SetReadOnly(TRUE);
 
 	return 0;
 }
 
 LRESULT CView::OnStyleNeeded(int, LPNMHDR hdr, BOOL&) {
-	auto notify = (SCNotification*)hdr;
-	auto start = m_BuildLog.GetEndStyled();
-	auto line = m_BuildLog.LineFromPosition(start);
-	start = m_BuildLog.PositionFromLine(line);
+	return 0;
+}
 
-	std::string text;
-	text.resize(notify->position - start);
-	Scintilla::TextRange r{ { (long)start, (long)notify->position}, text.data() };
-	m_BuildLog.GetTextRange(&r);
-	if (text.find("warning") != std::string::npos) {
-
+LRESULT CView::OnBuildLogDoubleClick(int, LPNMHDR hdr, BOOL&) {
+	auto n = (SCNotification*)hdr;
+	auto text = m_BuildLog.GetLine(n->line);
+	if (int n = text.Find(m_Document->GetName()); n >= 0) {
+		PWSTR end;
+		int line = wcstol((PCWSTR)text + n + 1 + m_Document->GetName().GetLength(), &end, 10);
+		int col = wcstol(end + 1, nullptr, 10);
+		m_BuildLog.ClearSelections();
+		m_Editor.GotoPos(m_Editor.PositionFromLine(line - 1) + col - 1);
+		m_Editor.SetFocus();
 	}
 	return 0;
 }

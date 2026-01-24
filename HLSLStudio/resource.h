@@ -12,11 +12,18 @@
 #define IDI_OPEN                        205
 #define IDI_PASTE                       206
 #define IDI_SAVE                        207
+#define IDI_CUT                         209
+#define IDI_NEW                         211
+#define IDI_REDO                        212
+#define IDI_UNDO                        213
+#define IDI_ICON1                       214
+#define IDI_RUN                         214
 #define IDC_TYPE                        1000
 #define IDC_EDIT1                       1001
 #define IDC_MAIN                        1001
 #define IDC_COMBO1                      1002
 #define IDC_PROFILE                     1002
+#define IDC_ENABLE                      1003
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_HLSL_COMPILE                 32775
@@ -27,14 +34,16 @@
 #define ID_NEW_HULLSHADER               32780
 #define ID_NEW_EMPTYSHADER              32781
 #define ID_FILE_REC                     32782
+#define ID_EDIT_REDO32783               32783
+#define ID_HLSL_RUN                     32784
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        209
-#define _APS_NEXT_COMMAND_VALUE         32783
-#define _APS_NEXT_CONTROL_VALUE         1003
+#define _APS_NEXT_RESOURCE_VALUE        215
+#define _APS_NEXT_COMMAND_VALUE         32785
+#define _APS_NEXT_CONTROL_VALUE         1004
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

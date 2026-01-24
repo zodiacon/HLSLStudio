@@ -3,6 +3,8 @@
 #include "View.h"
 #include "MainFrm.h"
 
+#include "ToolbarHelper.h"
+
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) {
 	if (CFrameWindowImpl::PreTranslateMessage(pMsg))
 		return TRUE;
@@ -29,9 +31,30 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	images.Create(16, 16, ILC_COLOR32, 2, 2);
 	images.AddIcon(AtlLoadIconImage(IDI_HLSL));
 
+	m_Tabs.m_bTabCloseButton = false;
 	m_hWndClient = m_Tabs.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, WS_EX_CLIENTEDGE);
 	UISetCheck(ID_VIEW_STATUS_BAR, 1);
 	m_Tabs.SetImageList(images);
+
+	ToolBarButtonInfo const buttons[] = {
+		{ ID_FILE_NEW, IDI_NEW },
+		{ ID_FILE_OPEN, IDI_OPEN },
+		{ 0 },
+		{ ID_HLSL_COMPILE, IDI_COMPILE },
+		{ 0 },
+		{ ID_EDIT_COPY, IDI_COPY },
+		{ ID_EDIT_CUT, IDI_CUT },
+		{ ID_EDIT_PASTE, IDI_PASTE },
+		{ ID_EDIT_UNDO, IDI_UNDO },
+	};
+	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
+	auto tb = ToolbarHelper::CreateAndInitToolBar(m_hWnd, buttons, _countof(buttons));
+
+	AddSimpleReBarBand(tb);
+	UIAddToolBar(tb);
+
+	InitMenu(GetMenu());
+	AddMenu(GetMenu());
 
 	// register object for message filtering and idle updates
 	CMessageLoop* pLoop = _Module.GetMessageLoop();
@@ -41,12 +64,35 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 
 	const int WINDOW_MENU_POSITION = 4;
 
-	AddMenu(GetMenu());
-
 	CMenuHandle menuMain = GetMenu();
 	m_Tabs.SetWindowMenu(menuMain.GetSubMenu(WINDOW_MENU_POSITION));
 
 	return 0;
+}
+
+void CMainFrame::InitMenu(HMENU hMenu) {
+	struct {
+		int id;
+		UINT icon;
+		HICON hIcon{ nullptr };
+	} const commands[] = {
+		{ ID_EDIT_COPY, IDI_COPY },
+		{ ID_FILE_NEW, IDI_NEW },
+		{ ID_EDIT_PASTE, IDI_PASTE },
+		{ ID_FILE_OPEN, IDI_OPEN },
+		{ ID_FILE_SAVE, IDI_SAVE },
+		{ ID_HLSL_COMPILE, IDI_COMPILE },
+		{ ID_EDIT_CUT, IDI_CUT },
+		{ ID_EDIT_PASTE, IDI_PASTE },
+		{ ID_EDIT_UNDO, IDI_UNDO },
+		{ ID_EDIT_REDO, IDI_REDO },
+	};
+	for (auto& cmd : commands) {
+		if (cmd.icon)
+			AddCommand(cmd.id, cmd.icon);
+		else
+			AddCommand(cmd.id, cmd.hIcon);
+	}
 }
 
 LRESULT CMainFrame::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) {
@@ -66,12 +112,13 @@ LRESULT CMainFrame::OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 }
 
 LRESULT CMainFrame::OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
+	auto doc = std::make_unique<ShaderDoc>();
 	auto pView = new CView(this);
 	pView->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	pView->SetName(L"Untitled");
-	m_Tabs.AddPage(pView->m_hWnd, pView->GetName(), 0, pView);
-
-	// TODO: add code to initialize document
+	doc->SetName(L"Untitled");
+	m_Tabs.AddPage(pView->m_hWnd, doc->GetName(), 0, pView);
+	pView->SetDocument(doc.get());
+	m_Documents.push_back(std::move(doc));
 
 	return 0;
 }
@@ -90,8 +137,12 @@ LRESULT CMainFrame::OnFileOpen(WORD, WORD, HWND, BOOL&) {
 		pView->DestroyWindow();
 		return 0;
 	}
-	pView->SetName(dlg.m_szFileTitle);
+	auto doc = std::make_unique<ShaderDoc>();
+	doc->SetPath(dlg.m_szFileName);
+	doc->SetName(dlg.m_szFileTitle);
+	pView->SetDocument(doc.get());
 	m_Tabs.AddPage(pView->m_hWnd, dlg.m_szFileTitle, 0, pView);
+	m_Documents.push_back(std::move(doc));
 
 	return 0;
 }
@@ -112,8 +163,10 @@ LRESULT CMainFrame::OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 
 LRESULT CMainFrame::OnWindowClose(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	int nActivePage = m_Tabs.GetActivePage();
-	if (nActivePage != -1)
+	if (nActivePage != -1) {
 		m_Tabs.RemovePage(nActivePage);
+		m_Documents.erase(m_Documents.begin() + nActivePage);
+	}
 	else
 		::MessageBeep((UINT)-1);
 
