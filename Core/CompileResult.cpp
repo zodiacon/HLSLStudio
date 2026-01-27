@@ -24,3 +24,9 @@ bool CompileResult::HasErrors() const noexcept {
 	HRESULT hr;
 	return S_OK == m_Result->GetStatus(&hr) && FAILED(hr);
 }
+
+CComPtr<IDxcBlob> CompileResult::GetByteCode() const {
+	CComPtr<IDxcBlob> blob;
+	m_Result->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&blob), nullptr);
+	return blob;
+}

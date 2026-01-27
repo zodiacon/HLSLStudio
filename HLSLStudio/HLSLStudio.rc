@@ -87,6 +87,8 @@ BEGIN
     BEGIN
         MENUITEM "&Compile",                    ID_HLSL_COMPILE
         MENUITEM "&Run",                        ID_HLSL_RUN
+        MENUITEM SEPARATOR
+        MENUITEM "Compiler &Options...",        ID_HLSL_COMPILEROPTIONS
     END
     POPUP "&Window"
     BEGIN
@@ -132,6 +134,8 @@ IDI_REDO                ICON                    "res\\Redo.ico"
 IDI_UNDO                ICON                    "res\\Undo.ico"
 
 IDI_RUN                 ICON                    "res\\run.ico"
+
+IDI_SETTINGS            ICON                    "res\\Gear.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////

@@ -10,6 +10,7 @@ public:
 	std::string GetErrors() const noexcept;
 	IDxcResult* Get() const noexcept;
 	bool HasErrors() const noexcept;
+	CComPtr<IDxcBlob> GetByteCode() const;
 
 private:
 	CComPtr<IDxcResult> m_Result;

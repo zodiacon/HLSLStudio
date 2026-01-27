@@ -129,8 +129,11 @@
     <Image Include="res\cut.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
+    <Image Include="res\Gear.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
     <Image Include="res\run.ico">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>
 </Project>

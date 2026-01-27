@@ -38,6 +38,9 @@ LRESULT CShaderBar::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 		{ L"Hull", ShaderType::Hull },
 		{ L"Compute", ShaderType::Compute },
 		{ L"Domain", ShaderType::Domain },
+		{ L"Mesh", ShaderType::Mesh },
+		{ L"Library", ShaderType::Library },
+		{ L"Amplification", ShaderType::Amplification },
 	};
 
 	for (auto& shader : shaders) {
@@ -53,7 +56,7 @@ LRESULT CShaderBar::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 
 LRESULT CShaderBar::OnTypeChanged(WORD, WORD, HWND, BOOL&) {
 	UpdateProfiles();
-	
+
 	auto type = GetShaderType();
 	auto item = m_Document->GetShader(type);
 	CheckDlgButton(IDC_ENABLE, item->Enabled);
@@ -66,17 +69,17 @@ LRESULT CShaderBar::OnTypeChanged(WORD, WORD, HWND, BOOL&) {
 	return 0;
 }
 
-LRESULT CShaderBar::OnMainChanged(WORD, WORD, HWND, BOOL&) {
+LRESULT CShaderBar::OnMainChanged(WORD, WORD, HWND, BOOL&) const {
 	GetDlgItemText(IDC_MAIN, m_Document->GetShader(GetShaderType())->Main);
 	return 0;
 }
 
-LRESULT CShaderBar::OnToggleEnable(WORD, WORD, HWND, BOOL&) {
+LRESULT CShaderBar::OnToggleEnable(WORD, WORD, HWND, BOOL&) const {
 	m_Document->GetShader(GetShaderType())->Enabled = IsDlgButtonChecked(IDC_ENABLE);
 	return 0;
 }
 
-LRESULT CShaderBar::OnProfileChanged(WORD, WORD, HWND, BOOL&) {
+LRESULT CShaderBar::OnProfileChanged(WORD, WORD, HWND, BOOL&) const {
 	m_ProfileCombo.GetWindowText(m_Document->GetShader(GetShaderType())->Profile);
 	return 0;
 }
@@ -86,10 +89,21 @@ void CShaderBar::UpdateProfiles() {
 
 	CString selected;
 	m_ShaderTypeCombo.GetWindowText(selected);
-	WCHAR prefix = tolower(selected[0]);
+	std::wstring prefix = (WCHAR)towlower(selected[0]) + std::wstring(L"s");
 
 	m_ProfileCombo.ResetContent();
-	for (int i = 0; i < 7; i++)
-		m_ProfileCombo.AddString(std::format(L"{}s_6_{}", prefix, i).c_str());
+	int start = 0, end = 9;
+	switch (type) {
+		case ShaderType::Amplification:
+		case ShaderType::Mesh:
+			start = 5;
+			break;
+	case ShaderType::Library:
+		start = 1;
+		prefix = L"lib";
+		break;
+	}
+	for (int i = start; i <= end; i++)
+		m_ProfileCombo.AddString(std::format(L"{}_6_{}", prefix, i).c_str());
 	m_ProfileCombo.SetCurSel(0);
 }

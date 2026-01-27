@@ -258,6 +258,7 @@
     <Image Include="res\Copy.ico" />
     <Image Include="res\cube.ico" />
     <Image Include="res\cut.ico" />
+    <Image Include="res\Gear.ico" />
     <Image Include="res\HLSL.ico" />
     <Image Include="res\HLSLStudio.ico" />
     <Image Include="res\new.ico" />
@@ -271,9 +272,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{efe113eb-a23d-40db-a52b-0db2ab5b86ae}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\lexilla\Lexilla.vcxproj">
-      <Project>{6d470002-e04d-4bbb-8b57-d20c2721fece}</Project>
     </ProjectReference>
     <ProjectReference Include="..\wtlhelper\WTLHelper\WTLHelper.vcxproj">
       <Project>{ae53419f-a769-4548-8e15-e311904df7df}</Project>

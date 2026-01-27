@@ -67,6 +67,23 @@ void CView::SetDocument(ShaderDoc* doc) noexcept {
 	m_ShaderBar.SetDocument(doc);
 }
 
+void CView::UpdateUIScintilla(HWND h) const {
+	auto& ui = *Frame();
+	Scintilla::CScintillaCtrl sc;
+	sc.Attach(h);
+#ifdef _DEBUG
+	WCHAR name[32];
+	ATLASSERT(::GetClassNameW(h, name, _countof(name)) > 0 && _wcsicmp(name, L"Scintilla") == 0);
+#endif
+
+	bool hasSelection = !sc.GetSelectionEmpty();
+	ui.UIEnable(ID_EDIT_COPY, hasSelection);
+	ui.UIEnable(ID_EDIT_PASTE, sc.CanPaste());
+	ui.UIEnable(ID_EDIT_CUT, hasSelection);
+	ui.UIEnable(ID_EDIT_UNDO, sc.CanUndo());
+	ui.UIEnable(ID_EDIT_REDO, sc.CanRedo());
+}
+
 CompileResult CView::CompileShader(ShaderItem& shader, const char* text, HLSLCompilerOptions& options) {
 	options.MainEntryPoint = shader.Main;
 	options.Target = shader.Profile;
@@ -129,6 +146,7 @@ LRESULT CView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOO
 	ToolBarButtonInfo const buttons[] = {
 		{ ID_HLSL_COMPILE, IDI_COMPILE, BTNS_BUTTON, L"Compile" },
 		{ ID_HLSL_RUN, IDI_RUN, BTNS_BUTTON, L"Run" },
+		{ ID_HLSL_COMPILEROPTIONS, IDI_SETTINGS },
 	};
 	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
 	auto tb = ToolbarHelper::CreateAndInitToolBar(m_hWnd, buttons, _countof(buttons), 16);
@@ -211,5 +229,10 @@ LRESULT CView::OnBuildLogDoubleClick(int, LPNMHDR hdr, BOOL&) {
 		m_Editor.GotoPos(m_Editor.PositionFromLine(line - 1) + col - 1);
 		m_Editor.SetFocus();
 	}
+	return 0;
+}
+
+LRESULT CView::OnUpdateUIScintilla(int, LPNMHDR hdr, BOOL&) {
+	UpdateUIScintilla(hdr->hwndFrom);
 	return 0;
 }

@@ -27,6 +27,7 @@ protected:
 	BEGIN_MSG_MAP(CView)
 		COMMAND_ID_HANDLER(ID_HLSL_COMPILE, OnCompile)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
+		NOTIFY_CODE_HANDLER(SCN_UPDATEUI, OnUpdateUIScintilla)
 		NOTIFY_HANDLER(IDC_LOGGER, SCN_STYLENEEDED, OnStyleNeeded)
 		NOTIFY_HANDLER(IDC_LOGGER, SCN_DOUBLECLICK, OnBuildLogDoubleClick)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
@@ -41,8 +42,11 @@ protected:
 	void SetDocument(ShaderDoc* doc) noexcept;
 
 private:
+	void UpdateUIScintilla(HWND h) const;
+
 	static const int WarningStyle = 51, ErrorStyle = 50;
 	static const UINT IDC_EDITOR = 0x123, IDC_LOGGER = 0x124;
+	
 	CompileResult CompileShader(ShaderItem& shader, const char* text, HLSLCompilerOptions& options);
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -55,6 +59,7 @@ private:
 	LRESULT OnCompile(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnStyleNeeded(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
 	LRESULT OnBuildLogDoubleClick(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
+	LRESULT OnUpdateUIScintilla(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
 
 private:
 	CEditor m_Editor;

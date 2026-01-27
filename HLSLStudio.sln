@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.2.11408.102 d18.0
+VisualStudioVersion = 18.2.11408.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HLSLStudio", "HLSLStudio\HLSLStudio.vcxproj", "{2811ECD1-A8F1-65A2-E76E-F9F2CAE71318}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WTLHelper", "wtlhelper\WTLHelper\WTLHelper.vcxproj", "{AE53419F-A769-4548-8E15-E311904DF7DF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "Core\Core.vcxproj", "{EFE113EB-A23D-40DB-A52B-0DB2AB5B86AE}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lexilla", "lexilla\Lexilla.vcxproj", "{6D470002-E04D-4BBB-8B57-D20C2721FECE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,14 +41,6 @@ Global
 		{EFE113EB-A23D-40DB-A52B-0DB2AB5B86AE}.Release|x64.Build.0 = Release|x64
 		{EFE113EB-A23D-40DB-A52B-0DB2AB5B86AE}.Release|x86.ActiveCfg = Release|Win32
 		{EFE113EB-A23D-40DB-A52B-0DB2AB5B86AE}.Release|x86.Build.0 = Release|Win32
-		{6D470002-E04D-4BBB-8B57-D20C2721FECE}.Debug|x64.ActiveCfg = Debug|x64
-		{6D470002-E04D-4BBB-8B57-D20C2721FECE}.Debug|x64.Build.0 = Debug|x64
-		{6D470002-E04D-4BBB-8B57-D20C2721FECE}.Debug|x86.ActiveCfg = Debug|Win32
-		{6D470002-E04D-4BBB-8B57-D20C2721FECE}.Debug|x86.Build.0 = Debug|Win32
-		{6D470002-E04D-4BBB-8B57-D20C2721FECE}.Release|x64.ActiveCfg = Release|x64
-		{6D470002-E04D-4BBB-8B57-D20C2721FECE}.Release|x64.Build.0 = Release|x64
-		{6D470002-E04D-4BBB-8B57-D20C2721FECE}.Release|x86.ActiveCfg = Release|Win32
-		{6D470002-E04D-4BBB-8B57-D20C2721FECE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

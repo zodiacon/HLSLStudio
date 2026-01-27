@@ -18,11 +18,17 @@ class CMainFrame :
 	public CMessageFilter,
 	public CIdleHandler {
 public:
+	CMainFrame() = default;
+
 	DECLARE_FRAME_WND_CLASS(L"HLSLStudioMainFrame", IDR_MAINFRAME)
+
+	CMainFrame(CMainFrame const&) = delete;
+	CMainFrame& operator=(CMainFrame const&) = delete;
 
 	BOOL PreTranslateMessage(MSG* pMsg) override;
 	BOOL OnIdle() override;
 	BOOL UIAddToolBar(HWND tb) override;
+	BOOL UIEnable(UINT id, bool enable) override;
 
 protected:
 	BEGIN_MSG_MAP(CMainFrame)

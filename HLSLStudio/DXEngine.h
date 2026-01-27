@@ -1,33 +1,60 @@
 #pragma once
 
+#include <wil\resource.h>
+
 #define HR(x) { HRESULT _hr = (x); if(FAILED(_hr)) return _hr; }
+#define DX_ASSERT(x) ATLASSERT(SUCCEEDED(x))
+#define DX_VERIFY(x) ATLVERIFY(SUCCEEDED(x))
 
 class DXEngine {
 public:
 	HRESULT Init(HWND hWnd, bool useWarp = false);
+	virtual ~DXEngine() noexcept = default;
 
-	static CComPtr<IDXGIAdapter1> GetHardwareAdapter();
-	static CComPtr<IDXGIAdapter1> GetWarpAdapter();
+	virtual void Update() noexcept;
+	virtual void Render() noexcept;
+
+	HRESULT SetPixelShader(void const* shader, uint32_t size) noexcept;
+	HRESULT SetVertexShader(void const* shader, uint32_t size) noexcept;
+	void SetClearColor(D3DCOLORVALUE color) noexcept;
+
+	static CComPtr<IDXGIAdapter1> GetHardwareAdapter() noexcept;
+	static CComPtr<IDXGIAdapter1> GetWarpAdapter() noexcept;
+
+	void OnResize(int width, int height) noexcept;
+
+	static constexpr int BufferCount = 2;
 
 private:
-	HRESULT CreateDevice();
-	HRESULT CreateSwapChain();
+	HRESULT CreateDevice() noexcept;
+	HRESULT CreateSwapChain() noexcept;
+	HRESULT CreateDefaultShaders() noexcept;
+	HRESULT CreateRootSignature() noexcept;
+	HRESULT UpdatePipelineState(IDxcBlob* vertexShader, IDxcBlob* pixelShader) noexcept;
+	void WaitForPreviousFrame() noexcept;
 
 	CComPtr<ID3D12Device> m_Device;
 #ifdef _DEBUG
 	CComPtr<ID3D12Debug1> m_Debug;
 #endif
-	CComPtr<ID3D12Resource> m_RenderTarget[2];
+	CComPtr<ID3D12Resource> m_RenderTarget[BufferCount];
 	CComPtr<ID3D12CommandAllocator> m_CommandAllocator;
 	CComPtr<ID3D12CommandQueue> m_CommandQueue;
 	CComPtr<ID3D12GraphicsCommandList> m_CommandList;
 	CComPtr<IDXGISwapChain3> m_SwapChain;
 	CComPtr<ID3D12DescriptorHeap> m_RtvHeap;
+	D3D12_CPU_DESCRIPTOR_HANDLE m_RtvHandle;
 	CComPtr<ID3D12DescriptorHeap> m_SrvHeap;
 	CComPtr<ID3D12PipelineState> m_PipelineState;
+	CComPtr<ID3D12RootSignature> m_RootSignature;
+
 	UINT m_RtvDescriptorSize;
 	int m_Width, m_Height;
 	UINT m_CurrentBufferIndex;
+	D3DCOLORVALUE m_ClearColor { 1, 0, 0, 1 };
+	UINT64 m_FenceValue{ 0 };
+	CComPtr<ID3D12Fence> m_Fence;
+	wil::unique_handle m_FenceEvent;
 	HWND m_hWnd { nullptr};
 	bool m_UseWarp { false};
 };

@@ -14,8 +14,6 @@
 extern CAppModule _Module;
 
 #include <atlwin.h>
-#include <d3d12.h>
-#include <d3d12shader.h>
 #include <atlframe.h>
 #include <atlctrls.h>
 #include <atldlgs.h>
@@ -24,11 +22,18 @@ extern CAppModule _Module;
 #include <atlctrlw.h>
 #include <memory>
 #include <vector>
-#include <scintilla/Scintilla.h>
+#include <string>
 #include <dxgi1_5.h>
-#include <dxgi1_5.h>
+#include <d3d12.h>
 #include <d3dx12.h>
+#include <d3d12shader.h>
 #include <dxcapi.h>
+#include <scintilla\Scintilla.h>
+#include <scintilla\ScintillaTypes.h>
+#include <scintilla\ScintillaCall.h>
+#include <scintilla\ScintillaMessages.h>
+#include <scintilla\ILoader.h>
+#include <scintilla\ScintillaStructures.h>
 
 #if defined _M_IX86
   #pragma comment(linker, "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")

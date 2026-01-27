@@ -22,6 +22,10 @@ BOOL CMainFrame::UIAddToolBar(HWND tb) {
 	return CAutoUpdateUI::UIAddToolBar(tb);
 }
 
+BOOL CMainFrame::UIEnable(UINT id, bool enable) {
+	return CAutoUpdateUI::UIEnable(id, enable);
+}
+
 LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	Scintilla_RegisterClasses(nullptr);
 
@@ -54,7 +58,6 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	UIAddToolBar(tb);
 
 	InitMenu(GetMenu());
-	AddMenu(GetMenu());
 
 	// register object for message filtering and idle updates
 	CMessageLoop* pLoop = _Module.GetMessageLoop();
@@ -66,6 +69,12 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 
 	CMenuHandle menuMain = GetMenu();
 	m_Tabs.SetWindowMenu(menuMain.GetSubMenu(WINDOW_MENU_POSITION));
+
+	UIEnable(ID_EDIT_COPY, false);
+	UIEnable(ID_EDIT_PASTE, false);
+	UIEnable(ID_EDIT_CUT, false);
+	UIEnable(ID_EDIT_UNDO, false);
+	UIEnable(ID_EDIT_REDO, false);
 
 	return 0;
 }
@@ -86,6 +95,8 @@ void CMainFrame::InitMenu(HMENU hMenu) {
 		{ ID_EDIT_PASTE, IDI_PASTE },
 		{ ID_EDIT_UNDO, IDI_UNDO },
 		{ ID_EDIT_REDO, IDI_REDO },
+		{ ID_HLSL_COMPILEROPTIONS, IDI_SETTINGS },
+		{ ID_HLSL_RUN, IDI_RUN },
 	};
 	for (auto& cmd : commands) {
 		if (cmd.icon)
@@ -93,11 +104,13 @@ void CMainFrame::InitMenu(HMENU hMenu) {
 		else
 			AddCommand(cmd.id, cmd.hIcon);
 	}
+	AddMenu(hMenu);
+	UIAddMenu(hMenu);
 }
 
 LRESULT CMainFrame::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled) {
 	// unregister message filtering and idle updates
-	CMessageLoop* pLoop = _Module.GetMessageLoop();
+	auto pLoop = _Module.GetMessageLoop();
 	ATLASSERT(pLoop);
 	pLoop->RemoveMessageFilter(this);
 	pLoop->RemoveIdleHandler(this);
