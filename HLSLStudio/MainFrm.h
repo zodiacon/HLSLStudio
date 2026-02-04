@@ -29,6 +29,10 @@ public:
 	BOOL OnIdle() override;
 	BOOL UIAddToolBar(HWND tb) override;
 	BOOL UIEnable(UINT id, bool enable) override;
+	void SetTabModified(HWND hTab, bool modified) override;
+	void SetTabTitle(HWND hTab, PCWSTR title) override;
+
+	int GetTabByHwnd(HWND h) const noexcept;
 
 protected:
 	BEGIN_MSG_MAP(CMainFrame)

@@ -3,7 +3,12 @@
 #include <wil\resource.h>
 
 #define HR(x) { HRESULT _hr = (x); if(FAILED(_hr)) return _hr; }
+#ifdef _DEBUG
 #define DX_ASSERT(x) ATLASSERT(SUCCEEDED(x))
+#else
+#define DX_ASSERT(x) __noop
+#endif
+
 #define DX_VERIFY(x) ATLVERIFY(SUCCEEDED(x))
 
 class DXEngine {

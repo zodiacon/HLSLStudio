@@ -545,9 +545,9 @@ namespace Scintilla {
 		void Clear();
 		void SetText(_In_z_ const char* text);
 		Position GetText(_In_ Position length, _Inout_updates_opt_(length + 1) char* text);
-		[[nodiscard]] Position GetTextLength();
+		[[nodiscard]] Position GetTextLength() noexcept;
 		void SetOvertype(_In_ BOOL overType);
-		[[nodiscard]] BOOL GetOvertype();
+		[[nodiscard]] BOOL GetOvertype() noexcept;
 		void SetCaretWidth(_In_ int pixelWidth);
 		[[nodiscard]] int GetCaretWidth();
 		void SetTargetStart(_In_ Position start);
@@ -1055,7 +1055,7 @@ namespace Scintilla {
 		//Member variables
 		FunctionDirect m_DirectStatusFunction;
 		sptr_t m_DirectPointer;
-		Status m_LastStatus;
+		mutable Status m_LastStatus;
 		DWORD m_dwOwnerThreadID;
 		bool m_bDoneInitialSetup;
 	};

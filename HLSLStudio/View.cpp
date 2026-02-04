@@ -59,6 +59,7 @@ bool CView::LoadFile(PCWSTR path) {
 		return false;
 
 	m_Editor.AddText(::GetFileSize(hFile.get(), nullptr), p.get());
+	m_Editor.SetSavePoint();
 	return true;
 }
 
@@ -82,6 +83,31 @@ void CView::UpdateUIScintilla(HWND h) const {
 	ui.UIEnable(ID_EDIT_CUT, hasSelection);
 	ui.UIEnable(ID_EDIT_UNDO, sc.CanUndo());
 	ui.UIEnable(ID_EDIT_REDO, sc.CanRedo());
+}
+
+bool CView::DoFileSaveAs() {
+	ThemeHelper::Suspend();
+	CSimpleFileDialog dlg(FALSE, L"hlsl", m_Document->GetName(), OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+		L"HLSL Files\0*.hlsl\0All Files\0*.*\0", m_hWnd);
+	auto ok = dlg.DoModal() == IDOK;
+	ThemeHelper::Resume();
+	if(ok) {
+		auto text = GetText();
+		if (m_Document->Save(text, dlg.m_szFileName)) {
+			m_Editor.SetSavePoint();
+			m_Document->SetName(dlg.m_szFileTitle);
+			Frame()->SetTabTitle(nullptr, m_Document->GetName());
+			return true;
+		}
+	}
+	return false;
+}
+
+CStringA CView::GetText() {
+	auto len = m_Editor.GetTextLength();
+	CStringA text;
+	m_Editor.GetText(len, text.GetBufferSetLength(len));
+	return text;
 }
 
 CompileResult CView::CompileShader(ShaderItem& shader, const char* text, HLSLCompilerOptions& options) {
@@ -234,5 +260,37 @@ LRESULT CView::OnBuildLogDoubleClick(int, LPNMHDR hdr, BOOL&) {
 
 LRESULT CView::OnUpdateUIScintilla(int, LPNMHDR hdr, BOOL&) {
 	UpdateUIScintilla(hdr->hwndFrom);
+	return 0;
+}
+
+LRESULT CView::OnDocModified(int, LPNMHDR hdr, BOOL&) {
+	if (m_Document) {
+		m_Document->SetModified(true);
+		Frame()->SetTabModified(nullptr, true);
+	}
+	return 0;
+}
+
+LRESULT CView::OnDocNotModified(int, LPNMHDR hdr, BOOL&) {
+	if (m_Document) {
+		m_Document->SetModified(false);
+		Frame()->SetTabModified(nullptr, false);
+	}
+	return 0;
+}
+
+LRESULT CView::OnFileSave(WORD, WORD, HWND, BOOL&) {
+	if (m_Document->GetPath().IsEmpty())
+		return DoFileSaveAs();
+
+	auto text = GetText();
+	if (m_Document->Save(text)) {
+		m_Editor.SetSavePoint();
+	}
+	return 0;
+}
+
+LRESULT CView::OnFileSaveAs(WORD, WORD, HWND, BOOL&) {
+	DoFileSaveAs();
 	return 0;
 }

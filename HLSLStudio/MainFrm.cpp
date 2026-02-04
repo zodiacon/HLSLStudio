@@ -26,6 +26,32 @@ BOOL CMainFrame::UIEnable(UINT id, bool enable) {
 	return CAutoUpdateUI::UIEnable(id, enable);
 }
 
+void CMainFrame::SetTabModified(HWND hTab, bool modified) {
+	int page = hTab ? GetTabByHwnd(hTab) : m_Tabs.GetActivePage();
+	if (page < 0)
+		return;
+	auto title = m_Tabs.GetPageTitle(page);
+	CString name(title);
+	if (modified)
+		name += "*";
+	else
+		name = name.Left(name.GetLength() - 1);
+	m_Tabs.SetPageTitle(page, name);
+}
+
+void CMainFrame::SetTabTitle(HWND hTab, PCWSTR title) {
+	int page = hTab ? GetTabByHwnd(hTab) : m_Tabs.GetActivePage();
+	if (page < 0)
+		return;
+	m_Tabs.SetPageTitle(page, title);
+}
+
+int CMainFrame::GetTabByHwnd(HWND h) const noexcept {
+	int count = m_Tabs.GetPageCount();
+
+	return 0;
+}
+
 LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	Scintilla_RegisterClasses(nullptr);
 

@@ -3230,7 +3230,7 @@ Position CScintillaCtrl::GetText(_In_ Position length, _Inout_updates_opt_(lengt
   return static_cast<Position>(Call(static_cast<UINT>(Message::GetText), static_cast<WPARAM>(length), reinterpret_cast<LPARAM>(text)));
 }
 
-Position CScintillaCtrl::GetTextLength()
+Position CScintillaCtrl::GetTextLength() noexcept
 {
   return static_cast<Position>(Call(static_cast<UINT>(Message::GetTextLength), 0, 0));
 }
@@ -3240,7 +3240,7 @@ void CScintillaCtrl::SetOvertype(_In_ BOOL overType)
   Call(static_cast<UINT>(Message::SetOvertype), static_cast<WPARAM>(overType), 0);
 }
 
-BOOL CScintillaCtrl::GetOvertype()
+BOOL CScintillaCtrl::GetOvertype() noexcept
 {
   return static_cast<BOOL>(Call(static_cast<UINT>(Message::GetOvertype), 0, 0));
 }

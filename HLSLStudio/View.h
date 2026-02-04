@@ -28,6 +28,8 @@ protected:
 		COMMAND_ID_HANDLER(ID_HLSL_COMPILE, OnCompile)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		NOTIFY_CODE_HANDLER(SCN_UPDATEUI, OnUpdateUIScintilla)
+		NOTIFY_HANDLER(IDC_EDITOR, SCN_SAVEPOINTREACHED, OnDocNotModified)
+		NOTIFY_HANDLER(IDC_EDITOR, SCN_SAVEPOINTLEFT, OnDocModified)
 		NOTIFY_HANDLER(IDC_LOGGER, SCN_STYLENEEDED, OnStyleNeeded)
 		NOTIFY_HANDLER(IDC_LOGGER, SCN_DOUBLECLICK, OnBuildLogDoubleClick)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
@@ -35,6 +37,8 @@ protected:
 
 		ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_HLSL_COMPILE, OnCompile)
+		COMMAND_ID_HANDLER(ID_FILE_SAVE, OnFileSave)
+		COMMAND_ID_HANDLER(ID_FILE_SAVE_AS, OnFileSaveAs)
 		CHAIN_MSG_MAP_ALT_MEMBER(m_Editor, 1)
 	END_MSG_MAP()
 
@@ -43,6 +47,8 @@ protected:
 
 private:
 	void UpdateUIScintilla(HWND h) const;
+	bool DoFileSaveAs();
+	CStringA GetText();
 
 	static const int WarningStyle = 51, ErrorStyle = 50;
 	static const UINT IDC_EDITOR = 0x123, IDC_LOGGER = 0x124;
@@ -60,6 +66,10 @@ private:
 	LRESULT OnStyleNeeded(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
 	LRESULT OnBuildLogDoubleClick(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
 	LRESULT OnUpdateUIScintilla(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
+	LRESULT OnDocModified(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
+	LRESULT OnDocNotModified(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
+	LRESULT OnFileSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnFileSaveAs(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 private:
 	CEditor m_Editor;
@@ -70,5 +80,5 @@ private:
 	HLSLCompiler m_Compiler;
 	CompileResult m_Result;
 	CShaderBar m_ShaderBar;
-	ShaderDoc* m_Document;
+	ShaderDoc* m_Document{ nullptr };
 };
