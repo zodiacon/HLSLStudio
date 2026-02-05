@@ -209,6 +209,11 @@ LRESULT CView::OnDestroy(UINT, WPARAM, LPARAM, BOOL& handled) {
 	return 0;
 }
 
+LRESULT CView::OnSetFocus(UINT, WPARAM, LPARAM, BOOL&) {
+	m_Editor.SetFocus();
+	return 0;
+}
+
 LRESULT CView::OnCompile(WORD, WORD, HWND, BOOL&) {
 	std::string text;
 	text.resize(m_Editor.GetTextLength());

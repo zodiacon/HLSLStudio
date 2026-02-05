@@ -14,15 +14,13 @@
 class DXEngine {
 public:
 	HRESULT Init(HWND hWnd, bool useWarp = false);
-	virtual ~DXEngine() noexcept = default;
+	virtual ~DXEngine() noexcept;
 
 	virtual void Update() noexcept;
 	virtual void Render() noexcept;
 
-	void SetPixelShader(void const* shader, uint32_t size) noexcept;
 	void SetPixelShader(IDxcBlob* blob) noexcept;
-	HRESULT SetVertexShader(void const* shader, uint32_t size) noexcept;
-	HRESULT SetVertexShader(IDxcBlob* blob) noexcept;
+	void SetVertexShader(IDxcBlob* blob) noexcept;
 	void SetClearColor(D3DCOLORVALUE color) noexcept;
 
 	static CComPtr<IDXGIAdapter1> GetHardwareAdapter() noexcept;
@@ -45,6 +43,7 @@ private:
 #ifdef _DEBUG
 	CComPtr<ID3D12Debug1> m_Debug;
 #endif
+	CComPtr<ID3D12Resource> m_VertexBuffer;
 	CComPtr<ID3D12Resource> m_RenderTarget[BufferCount];
 	CComPtr<ID3D12CommandAllocator> m_CommandAllocator;
 	CComPtr<ID3D12CommandQueue> m_CommandQueue;
@@ -55,7 +54,6 @@ private:
 	CComPtr<ID3D12DescriptorHeap> m_SrvHeap;
 	CComPtr<ID3D12PipelineState> m_PipelineState;
 	CComPtr<ID3D12RootSignature> m_RootSignature;
-	CComPtr<ID3D12Resource> m_VertexBuffer;
 	CComPtr<IDxcBlob> m_VertexShader, m_PixelShader;
 	D3D12_VERTEX_BUFFER_VIEW m_VertexBufferView;
 

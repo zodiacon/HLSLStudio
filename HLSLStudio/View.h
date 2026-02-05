@@ -28,20 +28,17 @@ protected:
 		COMMAND_ID_HANDLER(ID_HLSL_COMPILE, OnCompile)
 		COMMAND_ID_HANDLER(ID_HLSL_RUN, OnRun)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
+		MESSAGE_HANDLER(WM_SETFOCUS, OnSetFocus)
 		NOTIFY_CODE_HANDLER(SCN_UPDATEUI, OnUpdateUIScintilla)
 		NOTIFY_HANDLER(IDC_EDITOR, SCN_SAVEPOINTREACHED, OnDocNotModified)
 		NOTIFY_HANDLER(IDC_EDITOR, SCN_SAVEPOINTLEFT, OnDocModified)
 		NOTIFY_HANDLER(IDC_LOGGER, SCN_STYLENEEDED, OnStyleNeeded)
 		NOTIFY_HANDLER(IDC_LOGGER, SCN_DOUBLECLICK, OnBuildLogDoubleClick)
-		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
-		CHAIN_MSG_MAP(CFrameView)
-
-		ALT_MSG_MAP(1)
-		COMMAND_ID_HANDLER(ID_HLSL_COMPILE, OnCompile)
-		COMMAND_ID_HANDLER(ID_HLSL_RUN, OnRun)
 		COMMAND_ID_HANDLER(ID_FILE_SAVE, OnFileSave)
 		COMMAND_ID_HANDLER(ID_FILE_SAVE_AS, OnFileSaveAs)
+		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 		CHAIN_MSG_MAP_ALT_MEMBER(m_Editor, 1)
+		CHAIN_MSG_MAP(CFrameView)
 	END_MSG_MAP()
 
 	bool LoadFile(PCWSTR path);
@@ -64,6 +61,7 @@ private:
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnSetFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnCompile(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnRun(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnStyleNeeded(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);

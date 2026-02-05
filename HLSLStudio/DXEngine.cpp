@@ -234,6 +234,10 @@ HRESULT DXEngine::Init(HWND hWnd, bool useWarp) {
 	return S_OK;
 }
 
+DXEngine::~DXEngine() noexcept {
+	WaitForPreviousFrame();
+}
+
 void DXEngine::Update() noexcept {
 }
 

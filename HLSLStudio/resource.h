@@ -17,7 +17,6 @@
 #define IDI_REDO                        212
 #define IDI_UNDO                        213
 #define IDI_RUN                         214
-#define IDI_ICON1                       216
 #define IDI_SETTINGS                    216
 #define IDC_TYPE                        1000
 #define IDC_EDIT1                       1001
@@ -25,6 +24,7 @@
 #define IDC_COMBO1                      1002
 #define IDC_PROFILE                     1002
 #define IDC_ENABLE                      1003
+#define IDC_LOGO                        1004
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_HLSL_COMPILE                 32775
@@ -45,7 +45,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        217
 #define _APS_NEXT_COMMAND_VALUE         32786
-#define _APS_NEXT_CONTROL_VALUE         1004
+#define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -9,6 +9,8 @@
 
 LRESULT CAboutDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	CenterWindow(GetParent());
+	GetDlgItem(IDC_LOGO).MoveWindow(4, 4, 48, 48);
+
 	return TRUE;
 }
 
