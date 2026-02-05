@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "DXEngine.h"
-
+#include <DirectXMath.h>
 #include "HLSLCompiler.h"
 
 #pragma comment(lib, "d3d12")
@@ -112,35 +112,13 @@ HRESULT DXEngine::CreateDefaultShaders() noexcept {
 	options.MainEntryPoint = L"VSMain";
 	auto vs = compiler.CompileSource(code, options);
 	ATLASSERT(!vs.HasErrors());
-	auto vsBlob = vs.GetByteCode();
-	if (!vsBlob)
-		return E_FAIL;
+	m_VertexShader = vs.GetByteCode();
 
 	options.Target = L"ps_6_0";
 	options.MainEntryPoint = L"PSMain";
 	auto ps = compiler.CompileSource(code, options);
 	ATLASSERT(!ps.HasErrors());
-	auto psBlob = ps.GetByteCode();
-
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[] = {
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-	};
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc{};
-	psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
-	psoDesc.pRootSignature = m_RootSignature;
-	psoDesc.VS = CD3DX12_SHADER_BYTECODE(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize());
-	psoDesc.PS = CD3DX12_SHADER_BYTECODE(psBlob->GetBufferPointer(), psBlob->GetBufferSize());
-	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-	psoDesc.DepthStencilState.DepthEnable = FALSE;
-	psoDesc.DepthStencilState.StencilEnable = FALSE;
-	psoDesc.SampleMask = UINT_MAX;
-	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	psoDesc.NumRenderTargets = 1;
-	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-	psoDesc.SampleDesc.Count = 1;
-	HR(m_Device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_PipelineState)));
+	m_PixelShader = ps.GetByteCode();
 
 	return S_OK;
 }
@@ -153,6 +131,74 @@ HRESULT DXEngine::CreateRootSignature() noexcept {
 	HR(D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &blob, nullptr));
 
 	return m_Device->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
+}
+
+HRESULT DXEngine::CreatePipelineState() noexcept {
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+	};
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc{};
+	desc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
+	desc.pRootSignature = m_RootSignature;
+	if (m_VertexShader) {
+		desc.VS.BytecodeLength = m_VertexShader->GetBufferSize();
+		desc.VS.pShaderBytecode = m_VertexShader->GetBufferPointer();
+	}
+	if (m_PixelShader) {
+		desc.PS.BytecodeLength = m_PixelShader->GetBufferSize();
+		desc.PS.pShaderBytecode = m_PixelShader->GetBufferPointer();
+	}
+	desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	desc.DepthStencilState.DepthEnable = FALSE;
+	desc.DepthStencilState.StencilEnable = FALSE;
+	desc.SampleMask = UINT_MAX;
+	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	desc.NumRenderTargets = 1;
+	desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.SampleDesc.Count = 1;
+
+	m_PipelineState = nullptr;
+	return m_Device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&m_PipelineState));
+}
+
+HRESULT DXEngine::CreateVertices() noexcept {
+	struct Vertex {
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT4 color;
+	};
+
+	Vertex triangleVertices[] = {
+	   { { -1.f, 1.f , 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+	   { { 1.f, 1.f , 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+	   { { -1.f, -1.f , 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+		{ { -1.f, -1.f, 0.0f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
+	   { { 1.f, 1.f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+	   { { 1.f, -1.f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+	};
+
+	const UINT vertexBufferSize = sizeof(triangleVertices);
+
+	CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_UPLOAD);
+	auto resDesc = CD3DX12_RESOURCE_DESC::Buffer(vertexBufferSize);
+	HR(m_Device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &resDesc, D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr, IID_PPV_ARGS(&m_VertexBuffer)));
+
+	// Copy the triangle data to the vertex buffer.
+	UINT8* pVertexDataBegin;
+	CD3DX12_RANGE readRange(0, 0);        // We do not intend to read from this resource on the CPU.
+	HR(m_VertexBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
+	memcpy(pVertexDataBegin, triangleVertices, vertexBufferSize);
+	m_VertexBuffer->Unmap(0, nullptr);
+
+	m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();
+	m_VertexBufferView.StrideInBytes = sizeof(Vertex);
+	m_VertexBufferView.SizeInBytes = vertexBufferSize;
+
+	return S_OK;
 }
 
 void DXEngine::WaitForPreviousFrame() noexcept {
@@ -180,6 +226,7 @@ HRESULT DXEngine::Init(HWND hWnd, bool useWarp) {
 	HR(CreateSwapChain());
 	HR(CreateRootSignature());
 	HR(CreateDefaultShaders());
+	HR(CreateVertices());
 
 	HR(m_Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_CommandAllocator, m_PipelineState, IID_PPV_ARGS(&m_CommandList)));
 	HR(m_CommandList->Close());
@@ -191,6 +238,10 @@ void DXEngine::Update() noexcept {
 }
 
 void DXEngine::Render() noexcept {
+	if (m_PipelineUpdateNeeded || m_PipelineState == nullptr) {
+		DX_VERIFY(CreatePipelineState());
+		m_PipelineUpdateNeeded = false;
+	}
 	DX_VERIFY(m_CommandAllocator->Reset());
 	DX_VERIFY(m_CommandList->Reset(m_CommandAllocator, m_PipelineState));
 
@@ -207,6 +258,10 @@ void DXEngine::Render() noexcept {
 	m_CommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
 	m_CommandList->ClearRenderTargetView(rtvHandle, (const FLOAT*)&m_ClearColor, 0, nullptr);
+	m_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_CommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView);
+	m_CommandList->DrawInstanced(6, 1, 0, 0);
+
 	barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_RenderTarget[m_CurrentBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 	m_CommandList->ResourceBarrier(1, &barrier);
 
@@ -217,6 +272,11 @@ void DXEngine::Render() noexcept {
 
 	DX_VERIFY(m_SwapChain->Present(1, 0));
 	WaitForPreviousFrame();
+}
+
+void DXEngine::SetPixelShader(IDxcBlob* blob) noexcept {
+	m_PixelShader = blob;
+	m_PipelineUpdateNeeded = true;
 }
 
 void DXEngine::SetClearColor(D3DCOLORVALUE color) noexcept {

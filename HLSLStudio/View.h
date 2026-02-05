@@ -26,6 +26,7 @@ public:
 protected:
 	BEGIN_MSG_MAP(CView)
 		COMMAND_ID_HANDLER(ID_HLSL_COMPILE, OnCompile)
+		COMMAND_ID_HANDLER(ID_HLSL_RUN, OnRun)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		NOTIFY_CODE_HANDLER(SCN_UPDATEUI, OnUpdateUIScintilla)
 		NOTIFY_HANDLER(IDC_EDITOR, SCN_SAVEPOINTREACHED, OnDocNotModified)
@@ -37,6 +38,7 @@ protected:
 
 		ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_HLSL_COMPILE, OnCompile)
+		COMMAND_ID_HANDLER(ID_HLSL_RUN, OnRun)
 		COMMAND_ID_HANDLER(ID_FILE_SAVE, OnFileSave)
 		COMMAND_ID_HANDLER(ID_FILE_SAVE_AS, OnFileSaveAs)
 		CHAIN_MSG_MAP_ALT_MEMBER(m_Editor, 1)
@@ -63,6 +65,7 @@ private:
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnCompile(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnRun(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnStyleNeeded(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
 	LRESULT OnBuildLogDoubleClick(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
 	LRESULT OnUpdateUIScintilla(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);

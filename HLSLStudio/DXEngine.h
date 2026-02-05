@@ -19,8 +19,10 @@ public:
 	virtual void Update() noexcept;
 	virtual void Render() noexcept;
 
-	HRESULT SetPixelShader(void const* shader, uint32_t size) noexcept;
+	void SetPixelShader(void const* shader, uint32_t size) noexcept;
+	void SetPixelShader(IDxcBlob* blob) noexcept;
 	HRESULT SetVertexShader(void const* shader, uint32_t size) noexcept;
+	HRESULT SetVertexShader(IDxcBlob* blob) noexcept;
 	void SetClearColor(D3DCOLORVALUE color) noexcept;
 
 	static CComPtr<IDXGIAdapter1> GetHardwareAdapter() noexcept;
@@ -35,7 +37,8 @@ private:
 	HRESULT CreateSwapChain() noexcept;
 	HRESULT CreateDefaultShaders() noexcept;
 	HRESULT CreateRootSignature() noexcept;
-	HRESULT UpdatePipelineState(IDxcBlob* vertexShader, IDxcBlob* pixelShader) noexcept;
+	HRESULT CreatePipelineState() noexcept;
+	HRESULT CreateVertices() noexcept;
 	void WaitForPreviousFrame() noexcept;
 
 	CComPtr<ID3D12Device> m_Device;
@@ -52,6 +55,9 @@ private:
 	CComPtr<ID3D12DescriptorHeap> m_SrvHeap;
 	CComPtr<ID3D12PipelineState> m_PipelineState;
 	CComPtr<ID3D12RootSignature> m_RootSignature;
+	CComPtr<ID3D12Resource> m_VertexBuffer;
+	CComPtr<IDxcBlob> m_VertexShader, m_PixelShader;
+	D3D12_VERTEX_BUFFER_VIEW m_VertexBufferView;
 
 	UINT m_RtvDescriptorSize;
 	int m_Width, m_Height;
@@ -60,7 +66,8 @@ private:
 	UINT64 m_FenceValue{ 0 };
 	CComPtr<ID3D12Fence> m_Fence;
 	wil::unique_handle m_FenceEvent;
-	HWND m_hWnd { nullptr};
-	bool m_UseWarp { false};
+	HWND m_hWnd { nullptr };
+	bool m_UseWarp { false };
+	bool m_PipelineUpdateNeeded{ false };
 };
 

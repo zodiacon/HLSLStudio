@@ -22,18 +22,18 @@ const char* KeyWords_CPP[] = {
 	"operator or override private protected public "
 	"register reinterpret_cast restrict return "
 	"short signed sizeof static static_assert static_cast struct switch "
-	"template this true typedef typeid typename "
+	"template true typedef typeid typename "
 	"union unsigned using virtual void volatile while xor",
 	// Secondary keywords
 		"float4 float3 float2 mat3x3 mat4x4",
 		"",
 	// special keywords
-		"SV_POSITION POSITION TEXCOORD SV_TARGET",
+		"SV_POSITION POSITION TEXCOORD SV_TARGET COLOR",
 	// Global classes and typedefs
-		"char8_t char16_t char32_t int16_t int32_t "
-		"int64_t int8_t intmax_t intptr_t ptrdiff_t size_t uint16_t uint32_t uint64_t uint8_t uintmax_t uintptr_t wchar_t",
-		"",
-		nullptr,
+		"char8_t char16_t char32_t int16_t int32_t cbuffer"
+		" int64_t int8_t intmax_t intptr_t ptrdiff_t size_t uint16_t uint32_t uint64_t uint8_t uintmax_t uintptr_t wchar_t",
+		"b0 b1 b2 b3 b4 t0 t1 t2 t3 t4 r0 r1 r2 r3 r4",
+	nullptr
 };
 
 CView::CView(IMainFrame* frame) : CFrameView(frame), m_RenderView(frame) {
@@ -237,6 +237,14 @@ LRESULT CView::OnCompile(WORD, WORD, HWND, BOOL&) {
 	}
 	m_BuildLog.SetReadOnly(TRUE);
 
+	return m_BuildLog.GetTextLength() == 0;
+}
+
+LRESULT CView::OnRun(WORD, WORD, HWND, BOOL&) {
+	auto success = SendMessage(WM_COMMAND, ID_HLSL_COMPILE);
+	if (success) {
+		m_RenderView.UpdateShaders(m_Document);
+	}
 	return 0;
 }
 
