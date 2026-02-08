@@ -57,10 +57,19 @@ BEGIN
         BEGIN
             MENUITEM "&Pixel Shader",               ID_NEW_PIXELSHADER
             MENUITEM "&Vertex Shader",              ID_NEW_VERTEXSHADER
+            MENUITEM "&Compute Shader",             ID_NEW_COMPUTESHADER
             MENUITEM "&Geometry Shader",            ID_NEW_GEOMETRYSHADER
             MENUITEM "&Hull Shader",                ID_NEW_HULLSHADER
             MENUITEM SEPARATOR
             MENUITEM "&Empty Shader",               ID_FILE_NEW
+        END
+        POPUP "A&dd"
+        BEGIN
+            MENUITEM "&Pixel Shader",               ID_ADD_PIXELSHADER
+            MENUITEM "&Vertex Shader",              ID_ADD_VERTEXSHADER
+            MENUITEM "&Compute Shader",             ID_ADD_COMPUTESHADER
+            MENUITEM "&Geometry Shader",            ID_ADD_GEOMETRYSHADER
+            MENUITEM "&Hull Shader",                ID_ADD_HULLSHADER
         END
         MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
         MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
@@ -149,7 +158,7 @@ CAPTION "About HLSL Studio"
 FONT 9, "Segoe UI", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,79,50,50,14
-    CTEXT           "HLSL Studio v0.1\n\n©2026 Pavel Yosifovich",IDC_STATIC,63,17,78,26
+    CTEXT           "HLSL Studio v0.2\n\n©2026 Pavel Yosifovich",IDC_STATIC,63,17,78,26
     ICON            IDR_MAINFRAME,IDC_LOGO,7,7,20,20
 END
 

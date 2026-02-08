@@ -4,12 +4,13 @@
 
 #include "pch.h"
 #include "resource.h"
-
 #include "aboutdlg.h"
 
 LRESULT CAboutDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	CenterWindow(GetParent());
-	GetDlgItem(IDC_LOGO).MoveWindow(4, 4, 48, 48);
+	SetDialogIcon(IDR_MAINFRAME);
+
+	GetDlgItem(IDC_LOGO).MoveWindow(12, 12, 48, 48);
 
 	return TRUE;
 }

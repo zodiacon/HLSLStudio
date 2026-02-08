@@ -38,13 +38,20 @@
 #define ID_EDIT_REDO32783               32783
 #define ID_HLSL_RUN                     32784
 #define ID_HLSL_COMPILEROPTIONS         32785
+#define ID_FILE_ADD                     32786
+#define ID_ADD_PIXELSHADER              32787
+#define ID_ADD_VERTEXSHADER             32788
+#define ID_ADD_GEOMETRYSHADER           32789
+#define ID_ADD_HULLSHADER               32790
+#define ID_NEW_COMPUTESHADER            32791
+#define ID_ADD_COMPUTESHADER            32792
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        217
-#define _APS_NEXT_COMMAND_VALUE         32786
+#define _APS_NEXT_COMMAND_VALUE         32793
 #define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

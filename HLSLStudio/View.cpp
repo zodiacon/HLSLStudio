@@ -91,7 +91,7 @@ bool CView::DoFileSaveAs() {
 		L"HLSL Files\0*.hlsl\0All Files\0*.*\0", m_hWnd);
 	auto ok = dlg.DoModal() == IDOK;
 	ThemeHelper::Resume();
-	if(ok) {
+	if (ok) {
 		auto text = GetText();
 		if (m_Document->Save(text, dlg.m_szFileName)) {
 			m_Editor.SetSavePoint();
@@ -229,15 +229,23 @@ LRESULT CView::OnCompile(WORD, WORD, HWND, BOOL&) {
 	HLSLCompilerOptions options;
 	options.Name = m_Document->GetName();
 
+	auto setDefaultMain = [](auto& shader) {
+		shader.Main = WCHAR(shader.Profile[0] & ~0x20) + CString(L"SMain");
+	};
+
 	int active = 0;
 	for (auto& shader : m_Document->GetActiveShaders()) {
 		active++;
+		if (shader.Main.IsEmpty())
+			setDefaultMain(shader);
 		shader.Result = CompileShader(shader, text.c_str(), options);
 	}
 	if (active == 0) {
 		// compile active shader
 		auto shader = m_Document->GetShader(m_ShaderBar.GetShaderType());
 		ATLASSERT(shader);
+		if (shader->Main.IsEmpty())
+			setDefaultMain(*shader);
 		shader->Result = CompileShader(*shader, text.c_str(), options);
 	}
 	m_BuildLog.SetReadOnly(TRUE);

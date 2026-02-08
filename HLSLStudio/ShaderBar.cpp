@@ -48,7 +48,8 @@ LRESULT CShaderBar::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 		m_ShaderTypeCombo.SetItemData(n, static_cast<DWORD_PTR>(shader.type));
 	}
 
-	m_ShaderTypeCombo.SetCurSel(0);
+	int n = m_ShaderTypeCombo.SelectString(-1, L"Pixel");
+	SetDlgItemText(IDC_MAIN, L"PSMain");
 	UpdateProfiles();
 
 	return 0;
@@ -60,6 +61,8 @@ LRESULT CShaderBar::OnTypeChanged(WORD, WORD, HWND, BOOL&) {
 	auto type = GetShaderType();
 	auto item = m_Document->GetShader(type);
 	CheckDlgButton(IDC_ENABLE, item->Enabled);
+	if (item->Main.IsEmpty())
+		item->Main = WCHAR(item->Profile[0] & ~0x20) + CString("SMain");
 	SetDlgItemText(IDC_MAIN, item->Main);
 	if (item->Profile.IsEmpty())
 		item->Profile = GetProfile();
@@ -70,7 +73,9 @@ LRESULT CShaderBar::OnTypeChanged(WORD, WORD, HWND, BOOL&) {
 }
 
 LRESULT CShaderBar::OnMainChanged(WORD, WORD, HWND, BOOL&) const {
-	GetDlgItemText(IDC_MAIN, m_Document->GetShader(GetShaderType())->Main);
+	if (m_Document) {
+		GetDlgItemText(IDC_MAIN, m_Document->GetShader(GetShaderType())->Main);
+	}
 	return 0;
 }
 
