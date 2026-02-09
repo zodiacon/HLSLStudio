@@ -61,13 +61,13 @@ LRESULT CShaderBar::OnTypeChanged(WORD, WORD, HWND, BOOL&) {
 	auto type = GetShaderType();
 	auto item = m_Document->GetShader(type);
 	CheckDlgButton(IDC_ENABLE, item->Enabled);
-	if (item->Main.IsEmpty())
-		item->Main = WCHAR(item->Profile[0] & ~0x20) + CString(L"SMain");
-	SetDlgItemText(IDC_MAIN, item->Main);
 	if (item->Profile.IsEmpty())
 		item->Profile = GetProfile();
 	else
 		m_ProfileCombo.SelectString(-1, item->Profile);
+	if (item->Main.IsEmpty())
+		item->Main = WCHAR(item->Profile[0] & ~0x20) + CString(L"SMain");
+	SetDlgItemText(IDC_MAIN, item->Main);
 
 	return 0;
 }
