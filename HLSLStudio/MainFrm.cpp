@@ -169,6 +169,9 @@ LRESULT CMainFrame::OnFileOpen(WORD, WORD, HWND, BOOL&) {
 	auto ok = IDOK == dlg.DoModal();
 	ThemeHelper::Resume();
 
+	if (!ok)
+		return 0;
+
 	auto pView = new CView(this);
 	pView->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
 	if (!pView->LoadFile(dlg.m_szFileName)) {

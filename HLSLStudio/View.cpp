@@ -211,6 +211,7 @@ LRESULT CView::OnDestroy(UINT, WPARAM, LPARAM, BOOL& handled) {
 
 LRESULT CView::OnSetFocus(UINT, WPARAM, LPARAM, BOOL&) {
 	m_Editor.SetFocus();
+	UpdateUIScintilla(m_Editor);
 	return 0;
 }
 
