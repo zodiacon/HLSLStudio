@@ -66,6 +66,13 @@ HRESULT DXEngine::CreateSwapChain() noexcept {
 		HR(m_Device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&m_RtvHeap)));
 
 		m_RtvDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc {};
+		srvHeapDesc.NumDescriptors = 1;
+		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		HR(m_Device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_SrvHeap)));
+
 	}
 
 	// Create frame resources
@@ -79,6 +86,21 @@ HRESULT DXEngine::CreateSwapChain() noexcept {
 			rtvHandle.Offset(1, m_RtvDescriptorSize);
 		}
 	}
+
+	CD3DX12_HEAP_PROPERTIES uploadHeap(D3D12_HEAP_TYPE_UPLOAD);
+	auto buffer = CD3DX12_RESOURCE_DESC::Buffer(sizeof(SceneConstantBuffer));
+	HR(m_Device->CreateCommittedResource(&uploadHeap,
+		D3D12_HEAP_FLAG_NONE, &buffer, D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr, IID_PPV_ARGS(&m_ConstBuffer)));
+
+
+	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc {};
+	cbvDesc.BufferLocation = m_ConstBuffer->GetGPUVirtualAddress();
+	cbvDesc.SizeInBytes = sizeof(SceneConstantBuffer);
+	m_Device->CreateConstantBufferView(&cbvDesc, m_SrvHeap->GetCPUDescriptorHandleForHeapStart());
+
+	CD3DX12_RANGE readRange(0, 0);        // We do not intend to read from this resource on the CPU.
+	HR(m_ConstBuffer->Map(0, &readRange, reinterpret_cast<void**>(&m_SceneConstBufferPtr)));
 
 	return S_OK;
 }
@@ -125,7 +147,10 @@ HRESULT DXEngine::CreateDefaultShaders() noexcept {
 
 HRESULT DXEngine::CreateRootSignature() noexcept {
 	CD3DX12_ROOT_SIGNATURE_DESC desc;
-	desc.Init(0, nullptr, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	CD3DX12_ROOT_PARAMETER params[1];
+	params[0].InitAsConstantBufferView(0);
+
+	desc.Init(_countof(params), params, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	CComPtr<ID3DBlob> blob;
 	HR(D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &blob, nullptr));
@@ -172,12 +197,12 @@ HRESULT DXEngine::CreateVertices() noexcept {
 	};
 
 	Vertex triangleVertices[] = {
-	   { { -1.f, 1.f , 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
-	   { { 1.f, 1.f , 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
-	   { { -1.f, -1.f , 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+		{ { -1.f, 1.f , 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+		{ { 1.f, 1.f , 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+		{ { -1.f, -1.f , 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
 		{ { -1.f, -1.f, 0.0f }, { 1.0f, 1.0f, 0.0f, 1.0f } },
-	   { { 1.f, 1.f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
-	   { { 1.f, -1.f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+		{ { 1.f, 1.f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+		{ { 1.f, -1.f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
 	};
 
 	const UINT vertexBufferSize = sizeof(triangleVertices);
@@ -239,6 +264,8 @@ DXEngine::~DXEngine() noexcept {
 }
 
 void DXEngine::Update() noexcept {
+	::QueryPerformanceCounter(&m_Time);
+	m_SceneConstBufferPtr->Time = m_Time.QuadPart / 10000000.0f;
 }
 
 void DXEngine::Render() noexcept {
@@ -254,6 +281,11 @@ void DXEngine::Render() noexcept {
 	m_CommandList->RSSetViewports(1, &vp);
 	CD3DX12_RECT rc(0, 0, m_Width, m_Height);
 	m_CommandList->RSSetScissorRects(1, &rc);
+
+	ID3D12DescriptorHeap* heaps[]{ m_SrvHeap };
+	m_CommandList->SetDescriptorHeaps(_countof(heaps), heaps);
+
+	m_CommandList->SetGraphicsRootConstantBufferView(0, m_ConstBuffer->GetGPUVirtualAddress());
 
 	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_RenderTarget[m_CurrentBufferIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	m_CommandList->ResourceBarrier(1, &barrier);
@@ -280,6 +312,11 @@ void DXEngine::Render() noexcept {
 
 void DXEngine::SetPixelShader(IDxcBlob* blob) noexcept {
 	m_PixelShader = blob;
+	m_PipelineUpdateNeeded = true;
+}
+
+void DXEngine::SetVertexShader(IDxcBlob* blob) noexcept {
+	m_VertexShader = blob;
 	m_PipelineUpdateNeeded = true;
 }
 

@@ -31,6 +31,15 @@ public:
 	static constexpr int BufferCount = 2;
 
 private:
+	struct SceneConstantBuffer {
+		float Time;
+	private:
+		char _padding[256 - sizeof(Time)];
+	};
+	static_assert(sizeof(SceneConstantBuffer) == 256);
+
+	SceneConstantBuffer* m_SceneConstBufferPtr { nullptr };
+	LARGE_INTEGER m_Time{ 0 };
 	HRESULT CreateDevice() noexcept;
 	HRESULT CreateSwapChain() noexcept;
 	HRESULT CreateDefaultShaders() noexcept;
@@ -45,6 +54,7 @@ private:
 #endif
 	CComPtr<ID3D12Resource> m_VertexBuffer;
 	CComPtr<ID3D12Resource> m_RenderTarget[BufferCount];
+	CComPtr<ID3D12Resource> m_ConstBuffer;
 	CComPtr<ID3D12CommandAllocator> m_CommandAllocator;
 	CComPtr<ID3D12CommandQueue> m_CommandQueue;
 	CComPtr<ID3D12GraphicsCommandList> m_CommandList;

@@ -168,6 +168,8 @@ LRESULT CView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOO
 		lexer->WordListSet(i, KeyWords_CPP[i]);
 
 	m_Editor.SetILexer(lexer);
+	m_Editor.SetTabWidth(4);
+	m_BuildLog.SetTabWidth(4);
 
 	ToolBarButtonInfo const buttons[] = {
 		{ ID_HLSL_COMPILE, IDI_COMPILE, BTNS_BUTTON, L"Compile" },
