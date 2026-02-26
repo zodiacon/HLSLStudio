@@ -91,7 +91,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	pLoop->AddMessageFilter(this);
 	pLoop->AddIdleHandler(this);
 
-	const int WINDOW_MENU_POSITION = 4;
+	const int WINDOW_MENU_POSITION = 5;
 
 	CMenuHandle menuMain = GetMenu();
 	m_Tabs.SetWindowMenu(menuMain.GetSubMenu(WINDOW_MENU_POSITION));
@@ -106,11 +106,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 }
 
 void CMainFrame::InitMenu(HMENU hMenu) {
-	struct {
-		int id;
-		UINT icon;
-		HICON hIcon{ nullptr };
-	} const commands[] = {
+	MenuItemData items[] {
 		{ ID_EDIT_COPY, IDI_COPY },
 		{ ID_FILE_NEW, IDI_NEW },
 		{ ID_EDIT_PASTE, IDI_PASTE },
@@ -124,13 +120,7 @@ void CMainFrame::InitMenu(HMENU hMenu) {
 		{ ID_HLSL_COMPILEROPTIONS, IDI_SETTINGS },
 		{ ID_HLSL_RUN, IDI_RUN },
 	};
-	for (auto& cmd : commands) {
-		if (cmd.icon)
-			AddCommand(cmd.id, cmd.icon);
-		else
-			AddCommand(cmd.id, cmd.hIcon);
-	}
-	AddMenu(hMenu);
+	WTLHelper::InitMenu(hMenu, items, _countof(items));
 	UIAddMenu(hMenu);
 }
 
@@ -165,27 +155,24 @@ LRESULT CMainFrame::OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl
 LRESULT CMainFrame::OnFileOpen(WORD, WORD, HWND, BOOL&) {
 	CSimpleFileDialog dlg(TRUE, L"hlsl", nullptr, OFN_EXPLORER | OFN_ENABLESIZING,
 		L"HLSL Files (*.hlsl)\0*.hlsl\0All Files\0*.*\0", m_hWnd);
-	ThemeHelper::Suspend();
+	WTLHelper::SuspendHook();
 	auto ok = IDOK == dlg.DoModal();
-	ThemeHelper::Resume();
-
-	if (!ok)
-		return 0;
-
-	auto pView = new CView(this);
-	pView->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
-	if (!pView->LoadFile(dlg.m_szFileName)) {
-		AtlMessageBox(m_hWnd, L"Failed to read file", IDR_MAINFRAME, MB_ICONERROR);
-		pView->DestroyWindow();
-		return 0;
+	WTLHelper::ResumeHook();
+	if (ok) {
+		auto pView = new CView(this);
+		pView->Create(m_Tabs, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0);
+		if (!pView->LoadFile(dlg.m_szFileName)) {
+			AtlMessageBox(m_hWnd, L"Failed to read file", IDR_MAINFRAME, MB_ICONERROR);
+			pView->DestroyWindow();
+			return 0;
+		}
+		auto doc = std::make_unique<ShaderDoc>();
+		doc->SetPath(dlg.m_szFileName);
+		doc->SetName(dlg.m_szFileTitle);
+		pView->SetDocument(doc.get());
+		m_Tabs.AddPage(pView->m_hWnd, dlg.m_szFileTitle, 0, pView);
+		m_Documents.push_back(std::move(doc));
 	}
-	auto doc = std::make_unique<ShaderDoc>();
-	doc->SetPath(dlg.m_szFileName);
-	doc->SetName(dlg.m_szFileTitle);
-	pView->SetDocument(doc.get());
-	m_Tabs.AddPage(pView->m_hWnd, dlg.m_szFileTitle, 0, pView);
-	m_Documents.push_back(std::move(doc));
-
 	return 0;
 }
 
@@ -224,6 +211,17 @@ LRESULT CMainFrame::OnWindowCloseAll(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*
 LRESULT CMainFrame::OnWindowActivate(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	int nPage = wID - ID_WINDOW_TABFIRST;
 	m_Tabs.SetActivePage(nPage);
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnThemeChange(WORD, WORD id, HWND, BOOL&) {
+	auto theme = id - ID_THEME_LIGHT;
+	if (WTLHelper::SwitchToMode((DarkMode::DarkModeType)theme, m_hWnd)) {
+		DrawMenuBar();
+		InitMenu(GetMenu());
+	}
+	UISetRadioMenuItem(id, ID_THEME_LIGHT, ID_THEME_SAMEASSYSTEM);
 
 	return 0;
 }

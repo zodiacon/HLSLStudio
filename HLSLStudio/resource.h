@@ -45,13 +45,19 @@
 #define ID_ADD_HULLSHADER               32790
 #define ID_NEW_COMPUTESHADER            32791
 #define ID_ADD_COMPUTESHADER            32792
+#define ID_OPTIONS_ALWAYSONTOP          32793
+#define ID_OPTIONS_THEME                32794
+#define ID_THEME_LIGHT                  32795
+#define ID_THEME_DARK                   32796
+#define ID_THEME_CLASSIC                32798
+#define ID_THEME_SAMEASSYSTEM           32797
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        217
-#define _APS_NEXT_COMMAND_VALUE         32793
+#define _APS_NEXT_COMMAND_VALUE         32799
 #define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

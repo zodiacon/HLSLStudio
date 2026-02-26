@@ -260,6 +260,8 @@ HRESULT DXEngine::Init(HWND hWnd, bool useWarp) {
 }
 
 DXEngine::~DXEngine() noexcept {
+	m_ConstBuffer->Unmap(0, nullptr);
+
 	WaitForPreviousFrame();
 }
 

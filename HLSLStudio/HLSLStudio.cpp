@@ -3,7 +3,7 @@
 
 #include "pch.h"
 #include "MainFrm.h"
-#include <ThemeHelper.h>
+#include <WTLHelper.h>
 
 #pragma comment(lib, "imm32")
 #pragma comment(lib, "dxcompiler")
@@ -38,7 +38,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	hRes = _Module.Init(nullptr, hInstance);
 	ATLASSERT(SUCCEEDED(hRes));
 
-	ThemeHelper::Init();
+	WTLHelper::InitDarkMode();
 
 	int nRet = Run(lpstrCmdLine, nCmdShow);
 

@@ -7,13 +7,14 @@
 #include "resource.h"
 #include "Interfaces.h"
 #include <OwnerDrawnMenu.h>
-#include <CustomTabView.h>
+#include <NativeCustomTabView.h>
+#include <NativeCustomTabView.h>
+#include "TabViewHelper.h"
 #include "ShaderDoc.h"
 
 class CMainFrame :
 	public CFrameWindowImpl<CMainFrame>,
 	public CAutoUpdateUI<CMainFrame>,
-	public COwnerDrawnMenu<CMainFrame>,
 	public IMainFrame,
 	public CMessageFilter,
 	public CIdleHandler {
@@ -47,8 +48,8 @@ protected:
 		COMMAND_ID_HANDLER(ID_WINDOW_CLOSE, OnWindowClose)
 		COMMAND_ID_HANDLER(ID_WINDOW_CLOSE_ALL, OnWindowCloseAll)
 		COMMAND_RANGE_HANDLER(ID_WINDOW_TABFIRST, ID_WINDOW_TABLAST, OnWindowActivate)
+		COMMAND_RANGE_HANDLER(ID_THEME_LIGHT, ID_THEME_CLASSIC, OnThemeChange)
 		CHAIN_MSG_MAP(CAutoUpdateUI)
-		CHAIN_MSG_MAP(COwnerDrawnMenu)
 		CHAIN_MSG_MAP(CFrameWindowImpl)
 	END_MSG_MAP()
 
@@ -69,8 +70,9 @@ private:
 	LRESULT OnWindowClose(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnWindowCloseAll(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnWindowActivate(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnThemeChange(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 private:
-	CCustomTabView m_Tabs;
+	CNativeCustomTabView m_Tabs;
 	std::vector<std::unique_ptr<ShaderDoc>> m_Documents;
 };

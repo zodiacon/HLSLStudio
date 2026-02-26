@@ -99,6 +99,17 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Compiler &Options...",        ID_HLSL_COMPILEROPTIONS
     END
+    POPUP "&Options"
+    BEGIN
+        MENUITEM "&Always on Top",              ID_OPTIONS_ALWAYSONTOP
+        POPUP "&Theme"
+        BEGIN
+            MENUITEM "&Light",                      ID_THEME_LIGHT
+            MENUITEM "&Dark",                       ID_THEME_DARK
+            MENUITEM "&Classic",                    ID_THEME_CLASSIC
+            MENUITEM "Same as &System",             ID_THEME_SAMEASSYSTEM
+        END
+    END
     POPUP "&Window"
     BEGIN
         MENUITEM "&Close\tCtrl+F4",             ID_WINDOW_CLOSE
@@ -106,7 +117,7 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
-        MENUITEM "&About HLSLStudio",           ID_APP_ABOUT
+        MENUITEM "&About HLSL Studio...",       ID_APP_ABOUT
     END
 END
 
