@@ -25,6 +25,9 @@
 #define IDC_PROFILE                     1002
 #define IDC_ENABLE                      1003
 #define IDC_LOGO                        1004
+#define IDC_VERSION                     1005
+#define IDC_VERSION2                    1006
+#define IDC_COPYRIGHT                   1006
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_HLSL_COMPILE                 32775
@@ -49,16 +52,18 @@
 #define ID_OPTIONS_THEME                32794
 #define ID_THEME_LIGHT                  32795
 #define ID_THEME_DARK                   32796
-#define ID_THEME_CLASSIC                32798
 #define ID_THEME_SAMEASSYSTEM           32797
+#define ID_THEME_CLASSIC                32798
+#define ID_HELP_DIRECTXINFORMATION      32799
+#define ID_VIEW_TOOLBAR32800            32800
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        217
-#define _APS_NEXT_COMMAND_VALUE         32799
-#define _APS_NEXT_CONTROL_VALUE         1005
+#define _APS_NEXT_COMMAND_VALUE         32801
+#define _APS_NEXT_CONTROL_VALUE         1006
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

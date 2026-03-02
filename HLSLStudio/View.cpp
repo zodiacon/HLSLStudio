@@ -10,8 +10,9 @@
 #include <wil/resource.h>
 #include "ShaderDoc.h"
 #include <scintilla/ILexer.h>
-#include "../lexilla/Lexlib/LexerModule.h"
-#include "../lexilla/Include/SciLexer.h"
+#include <Lexilla/lexlib/LexerModule.h>
+#include <Lexilla/SciLexer.h>
+#include <DarkMode/DarkModeSubclass.h>
 
 const char* KeyWords_CPP[] = {
 	// Primary keywords
@@ -202,6 +203,8 @@ LRESULT CView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOO
 
 	m_BuildLog.StyleSetFore(ErrorStyle, RGB(240, 0, 0));
 	m_BuildLog.StyleSetFore(WarningStyle, RGB(128, 128, 0));
+
+	DarkMode::setDarkWndNotifySafe(m_hWnd);
 
 	return S_OK == m_Compiler.Init() ? 0 : -1;
 }

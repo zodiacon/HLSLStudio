@@ -2,8 +2,8 @@
 #include "AboutDlg.h"
 #include "View.h"
 #include "MainFrm.h"
-
-#include "ToolbarHelper.h"
+#include <WTLHelper.h>
+#include <ToolbarHelper.h>
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) {
 	if (CFrameWindowImpl::PreTranslateMessage(pMsg))
@@ -63,7 +63,6 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 
 	m_Tabs.m_bTabCloseButton = false;
 	m_hWndClient = m_Tabs.Create(m_hWnd, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, WS_EX_CLIENTEDGE);
-	UISetCheck(ID_VIEW_STATUS_BAR, 1);
 	m_Tabs.SetImageList(images);
 
 	ToolBarButtonInfo const buttons[] = {
@@ -84,6 +83,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	UIAddToolBar(tb);
 
 	InitMenu(GetMenu());
+	UISetCheck(ID_VIEW_STATUS_BAR, 1);
 
 	// register object for message filtering and idle updates
 	CMessageLoop* pLoop = _Module.GetMessageLoop();

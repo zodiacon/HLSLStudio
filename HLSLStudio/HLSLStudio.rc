@@ -91,6 +91,7 @@ BEGIN
     POPUP "&View"
     BEGIN
         MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR32800
     END
     POPUP "H&LSL"
     BEGIN
@@ -118,6 +119,8 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "&About HLSL Studio...",       ID_APP_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "&DirectX Information...",     ID_HELP_DIRECTXINFORMATION
     END
 END
 
@@ -169,8 +172,9 @@ CAPTION "About HLSL Studio"
 FONT 9, "Segoe UI", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,79,50,50,14
-    CTEXT           "HLSL Studio v0.2\n\n©2026 Pavel Yosifovich",IDC_STATIC,63,17,78,26
+    CTEXT           "version",IDC_VERSION,62,10,78,8
     ICON            IDR_MAINFRAME,IDC_LOGO,7,7,20,20
+    CTEXT           "(C)",IDC_COPYRIGHT,62,24,78,8
 END
 
 IDD_SHADERBAR DIALOGEX 0, 0, 375, 16
@@ -266,7 +270,7 @@ BEGIN
             VALUE "InternalName", "HLSLStudio"
             VALUE "LegalCopyright", "©2026 Pavel Yosifovich"
             VALUE "OriginalFilename", "HLSLStudio.exe"
-            VALUE "ProductName", "HLSLStudio Module"
+            VALUE "ProductName", "HLSL Studio"
             VALUE "ProductVersion", "0.2.0.0"
         END
     END
