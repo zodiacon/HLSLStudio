@@ -41,7 +41,7 @@ HRESULT DXEngine::CreateSwapChain() noexcept {
 	m_Width = rc.right;
 	m_Height = rc.bottom;
 	DXGI_SWAP_CHAIN_DESC1 desc{};
-	desc.BufferCount = 2;
+	desc.BufferCount = BufferCount;
 	desc.Width = m_Width;
 	desc.Height = m_Height;
 	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -60,7 +60,7 @@ HRESULT DXEngine::CreateSwapChain() noexcept {
 	{
 		// Describe and create a render target view (RTV) descriptor heap.
 		D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc{};
-		rtvHeapDesc.NumDescriptors = 2;
+		rtvHeapDesc.NumDescriptors = BufferCount;
 		rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 		rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		HR(m_Device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&m_RtvHeap)));

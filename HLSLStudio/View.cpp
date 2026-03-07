@@ -204,8 +204,6 @@ LRESULT CView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOO
 	m_BuildLog.StyleSetFore(ErrorStyle, RGB(240, 0, 0));
 	m_BuildLog.StyleSetFore(WarningStyle, RGB(128, 128, 0));
 
-	DarkMode::setDarkWndNotifySafe(m_hWnd);
-
 	return S_OK == m_Compiler.Init() ? 0 : -1;
 }
 

@@ -102,6 +102,8 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	UIEnable(ID_EDIT_UNDO, false);
 	UIEnable(ID_EDIT_REDO, false);
 
+	UISetRadioMenuItem(ID_THEME_LIGHT + (UINT)WTLHelper::DarkModeType(), ID_THEME_LIGHT, ID_THEME_CLASSIC);
+
 	return 0;
 }
 
@@ -221,7 +223,7 @@ LRESULT CMainFrame::OnThemeChange(WORD, WORD id, HWND, BOOL&) {
 		DrawMenuBar();
 		InitMenu(GetMenu());
 	}
-	UISetRadioMenuItem(id, ID_THEME_LIGHT, ID_THEME_SAMEASSYSTEM);
+	UISetRadioMenuItem(ID_THEME_LIGHT + (UINT)WTLHelper::DarkModeType(), ID_THEME_LIGHT, ID_THEME_CLASSIC);
 
 	return 0;
 }
